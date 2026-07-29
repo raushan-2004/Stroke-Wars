@@ -59,8 +59,7 @@ class DashboardRegistry {
         subtitle: 'Refine your sketching speed and precision.',
         icon: Icons.brush_rounded,
         route: '/practice',
-        featureState: FeatureState.comingSoon,
-        stage: 'Stage 4',
+        featureState: FeatureState.enabled,
       ),
     ];
   }
