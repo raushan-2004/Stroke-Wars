@@ -73,7 +73,3 @@ class WordSelector {
     return shuffled.take(count).toList();
   }
 }
-
-extension _ListExt<T> on List<T> {
-  T? get firstOrNull => isEmpty ? null : first;
-}

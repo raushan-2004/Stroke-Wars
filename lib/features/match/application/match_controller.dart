@@ -21,6 +21,7 @@ import 'package:stroke_wars/features/match/domain/models/player_turn.dart';
 import 'package:stroke_wars/features/match/domain/models/round.dart';
 import 'package:stroke_wars/features/match/domain/models/round_id.dart';
 import 'package:stroke_wars/features/match/domain/models/round_state.dart';
+import 'package:stroke_wars/features/match/domain/models/score.dart';
 
 /// Plain Dart orchestrator for the match domain.
 ///
@@ -69,6 +70,9 @@ class MatchController {
 
   /// The current match, or null if none is active.
   Match? get match => _match;
+
+  /// Sets the match instance. Only used for testing.
+  set match(Match? value) => _match = value;
 
   /// Current [MatchContext], or null if no match is loaded.
   MatchContext? get context =>
@@ -354,8 +358,27 @@ class MatchController {
       guessTimeMs: guessTimeMs,
     );
 
+    final newScores = List<Score>.from(round.scores);
+    var pointsAwarded = 0;
+
+    if (isCorrect) {
+      final isFirst =
+          !round.guesses.any((g) => g.result == GuessResult.correct);
+      final scoreResult = scoring.scoreCorrectGuess(
+        playerId: cmd.playerId,
+        roundId: round.id,
+        guessTimeMs: guessTimeMs,
+        config: _match!.configuration,
+        isFirstGuesser: isFirst,
+        difficulty: round.word!.difficulty,
+      );
+      newScores.add(scoreResult.toScore());
+      pointsAwarded = scoreResult.points;
+    }
+
     final updatedRound = round.copyWith(
       guesses: [...round.guesses, guess],
+      scores: newScores,
     );
     _match = _match!.copyWith(rounds: _replaceCurrent(updatedRound));
 
@@ -369,24 +392,13 @@ class MatchController {
     );
 
     if (isCorrect) {
-      final isFirst =
-          !round.guesses.any((g) => g.result == GuessResult.correct);
-      final scoreResult = scoring.scoreCorrectGuess(
-        playerId: cmd.playerId,
-        roundId: round.id,
-        guessTimeMs: guessTimeMs,
-        config: _match!.configuration,
-        isFirstGuesser: isFirst,
-        difficulty: round.word!.difficulty,
-      );
-
       dispatcher.dispatch(
         CorrectGuessEvent(
           matchId: _match!.id,
           timestamp: now,
           playerId: cmd.playerId,
           guessTimeMs: guessTimeMs,
-          pointsAwarded: scoreResult.points,
+          pointsAwarded: pointsAwarded,
         ),
       );
     }
@@ -539,8 +551,4 @@ class MatchController {
     rounds[_match!.currentRoundIndex] = updated;
     return rounds;
   }
-}
-
-extension _ListExt<T> on List<T> {
-  T? get firstOrNull => isEmpty ? null : first;
 }

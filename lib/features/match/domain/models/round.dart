@@ -1,4 +1,5 @@
 import 'package:stroke_wars/features/match/domain/models/guess.dart';
+import 'package:stroke_wars/features/match/domain/models/guess_result.dart';
 import 'package:stroke_wars/features/match/domain/models/match_id.dart';
 import 'package:stroke_wars/features/match/domain/models/player_turn.dart';
 import 'package:stroke_wars/features/match/domain/models/round_configuration.dart';

@@ -26,7 +26,6 @@ class DefaultWordList implements WordRepository {
     }).toList();
 
     if (filtered.isEmpty) filtered = List.from(_words);
-    filtered.shuffle();
     return filtered.take(count).toList();
   }
 
