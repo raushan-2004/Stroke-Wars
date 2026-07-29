@@ -8,7 +8,6 @@ import 'package:stroke_wars/core/services/theme_service.dart';
 import 'package:stroke_wars/core/widgets/app_scaffold.dart';
 import 'package:stroke_wars/features/home/application/navigation_service.dart';
 import 'package:stroke_wars/features/home/application/notification_provider.dart';
-import 'package:stroke_wars/features/home/domain/models/dashboard_module.dart';
 import 'package:stroke_wars/features/home/domain/repositories/dashboard_registry.dart';
 import 'package:stroke_wars/features/profile/application/player_service.dart';
 import 'package:stroke_wars/shared/design_language/swdl.dart';
@@ -30,8 +29,6 @@ class GameCommandCenterPage extends ConsumerWidget {
     final navService = ref.watch(navigationServiceProvider);
     final badgeCount = ref.watch(notificationBadgeCountProvider);
 
-    final colors = context.swColors;
-    final typography = context.swTypography;
     final spacing = context.swSpacing;
 
     if (player == null) {

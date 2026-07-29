@@ -7,7 +7,6 @@ import 'package:stroke_wars/core/widgets/app_scaffold.dart';
 import 'package:stroke_wars/features/canvas/application/canvas_controller.dart';
 import 'package:stroke_wars/features/canvas/domain/models/brush_settings.dart';
 import 'package:stroke_wars/features/profile/application/player_service.dart';
-import 'package:stroke_wars/features/profile/presentation/profile_edit_page.dart';
 import 'package:stroke_wars/shared/design_language/swdl.dart';
 import 'package:stroke_wars/features/canvas/presentation/widgets/drawing_canvas.dart';
 

@@ -5,7 +5,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:stroke_wars/app/theme/app_colors.dart';
 import 'package:stroke_wars/app/theme/app_typography.dart';
 import 'package:stroke_wars/features/profile/application/player_service.dart';
-import 'package:stroke_wars/features/profile/domain/models/player_settings.dart';
 import 'package:stroke_wars/shared/design_language/tokens/sw_theme_extension.dart';
 
 part 'app_theme.g.dart';

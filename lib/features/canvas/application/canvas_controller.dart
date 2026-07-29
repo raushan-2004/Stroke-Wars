@@ -2,11 +2,11 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import 'package:stroke_wars/features/canvas/application/input/drawing_event_dispatcher.dart';
 import 'package:stroke_wars/features/canvas/domain/models/brush_settings.dart';
 import 'package:stroke_wars/features/canvas/domain/models/canvas_command.dart';
 import 'package:stroke_wars/features/canvas/domain/models/canvas_state.dart';
 import 'package:stroke_wars/features/canvas/domain/models/drawing_event.dart';
-import 'package:stroke_wars/features/canvas/domain/models/stroke.dart';
 import 'package:stroke_wars/features/canvas/domain/models/stroke_point.dart';
 import 'package:stroke_wars/features/canvas/domain/repositories/history_manager.dart';
 import 'package:stroke_wars/features/canvas/domain/repositories/render_queue.dart';
@@ -23,12 +23,15 @@ RenderQueue renderQueue(RenderQueueRef ref) {
 /// Central controller managing drawing states, command history, and event dispatch streams.
 class CanvasController {
   /// Creates a [CanvasController].
-  CanvasController({required this.renderQueue})
+  CanvasController({required this.renderQueue, required this.dispatcher})
     : _history = HistoryManager(),
       _state = CanvasState.initial();
 
   /// Target rendering queue buffering canvas frames.
   final RenderQueue renderQueue;
+
+  /// Dispatcher broadcasting events.
+  final DrawingEventDispatcher dispatcher;
 
   final HistoryManager _history;
   CanvasState _state;
@@ -69,6 +72,7 @@ class CanvasController {
       timestamp: startTime,
     );
     _events.add(event);
+    dispatcher.dispatch(event);
 
     _updateState(
       _state.copyWith(
@@ -101,6 +105,7 @@ class CanvasController {
 
     final event = PointAdded(strokeId: builder.id, point: point);
     _events.add(event);
+    dispatcher.dispatch(event);
 
     _updateState(_state.copyWith(activeStroke: () => builder.build()));
   }
@@ -116,6 +121,7 @@ class CanvasController {
 
     final event = StrokeFinished(strokeId: stroke.id);
     _events.add(event);
+    dispatcher.dispatch(event);
 
     if (stroke.points.isNotEmpty) {
       final command = AddStrokeCommand(stroke);
@@ -138,6 +144,7 @@ class CanvasController {
     if (!_history.canUndo) return;
     final newStrokes = _history.undo(_state.strokes);
     _events.add(const UndoPerformed());
+    dispatcher.dispatch(const UndoPerformed());
     _updateState(
       _state.copyWith(
         strokes: newStrokes,
@@ -152,6 +159,7 @@ class CanvasController {
     if (!_history.canRedo) return;
     final newStrokes = _history.redo(_state.strokes);
     _events.add(const RedoPerformed());
+    dispatcher.dispatch(const RedoPerformed());
     _updateState(
       _state.copyWith(
         strokes: newStrokes,
@@ -167,6 +175,7 @@ class CanvasController {
     final command = ClearCanvasCommand();
     final newStrokes = _history.executeCommand(command, _state.strokes);
     _events.add(const CanvasCleared());
+    dispatcher.dispatch(const CanvasCleared());
     _updateState(
       _state.copyWith(
         strokes: newStrokes,
@@ -232,5 +241,6 @@ class CanvasController {
 @riverpod
 CanvasController canvasController(CanvasControllerRef ref) {
   final queue = ref.watch(renderQueueProvider);
-  return CanvasController(renderQueue: queue);
+  final dispatcher = ref.watch(drawingEventDispatcherProvider);
+  return CanvasController(renderQueue: queue, dispatcher: dispatcher);
 }

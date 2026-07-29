@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'package:stroke_wars/features/home/domain/models/dashboard_module.dart';
-import 'package:stroke_wars/shared/design_language/swdl.dart';
 
 part 'dashboard_registry.g.dart';
 
