@@ -1,27 +1,52 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'package:stroke_wars/app/theme/app_colors.dart';
 import 'package:stroke_wars/app/theme/app_typography.dart';
+import 'package:stroke_wars/features/profile/application/player_service.dart';
+import 'package:stroke_wars/features/profile/domain/models/player_settings.dart';
 import 'package:stroke_wars/shared/design_language/tokens/sw_theme_extension.dart';
+
+part 'app_theme.g.dart';
+
+/// Helper mapping string accent color names to Flutter [Color] values.
+Color getAccentColorValue(String name) {
+  return switch (name.toLowerCase()) {
+    'cyan' => const Color(0xFF06B6D4),
+    'orange' => const Color(0xFFF97316),
+    'pink' => const Color(0xFFEC4899),
+    'green' => const Color(0xFF10B981),
+    'gold' => const Color(0xFFEAB308),
+    'purple' => const Color(0xFF8B5CF6),
+    _ => const Color(0xFF8B5CF6),
+  };
+}
 
 /// The central theme definition for Stroke Wars.
 ///
 /// Provides both light and dark [ThemeData] instances using Material 3.
 abstract final class AppTheme {
   /// Light theme definition.
-  static ThemeData get lightTheme => _buildTheme(brightness: Brightness.light);
+  static ThemeData get lightTheme =>
+      buildTheme(brightness: Brightness.light, accentName: 'purple');
 
   /// Dark theme definition.
-  static ThemeData get darkTheme => _buildTheme(brightness: Brightness.dark);
+  static ThemeData get darkTheme =>
+      buildTheme(brightness: Brightness.dark, accentName: 'purple');
 
-  static ThemeData _buildTheme({required Brightness brightness}) {
+  /// Builds [ThemeData] dynamically with custom accent colors.
+  static ThemeData buildTheme({
+    required Brightness brightness,
+    required String accentName,
+  }) {
     final isDark = brightness == Brightness.dark;
     final colors = isDark ? AppColors.dark : AppColors.light;
+    final primaryColor = getAccentColorValue(accentName);
 
     final colorScheme = ColorScheme(
       brightness: brightness,
-      primary: colors.primary,
+      primary: primaryColor,
       onPrimary: colors.onPrimary,
       primaryContainer: colors.primaryContainer,
       onPrimaryContainer: colors.onPrimaryContainer,
@@ -48,6 +73,14 @@ abstract final class AppTheme {
       inversePrimary: colors.inversePrimary,
     );
 
+    final baseColorsExtension = isDark
+        ? SWColorsExtension.dark
+        : SWColorsExtension.light;
+    final customColorsExtension = baseColorsExtension.copyWith(
+      primary: primaryColor,
+      borderActive: primaryColor,
+    );
+
     return ThemeData(
       useMaterial3: true,
       brightness: brightness,
@@ -55,8 +88,8 @@ abstract final class AppTheme {
       textTheme: AppTypography.buildTextTheme(colorScheme),
       scaffoldBackgroundColor: colors.background,
       extensions: [
-        if (isDark) SWColorsExtension.dark else SWColorsExtension.light,
-        if (isDark) SWGradientsExtension.dark else SWGradientsExtension.light,
+        customColorsExtension,
+        isDark ? SWGradientsExtension.dark : SWGradientsExtension.light,
       ],
       appBarTheme: AppBarTheme(
         backgroundColor: Colors.transparent,
@@ -72,7 +105,7 @@ abstract final class AppTheme {
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: colors.primary,
+          backgroundColor: primaryColor,
           foregroundColor: colors.onPrimary,
           elevation: 0,
           shape: RoundedRectangleBorder(
@@ -83,7 +116,7 @@ abstract final class AppTheme {
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          backgroundColor: colors.primary,
+          backgroundColor: primaryColor,
           foregroundColor: colors.onPrimary,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
@@ -93,8 +126,8 @@ abstract final class AppTheme {
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor: colors.primary,
-          side: BorderSide(color: colors.primary, width: 1.5),
+          foregroundColor: primaryColor,
+          side: BorderSide(color: primaryColor, width: 1.5),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
@@ -114,7 +147,7 @@ abstract final class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: colors.primary, width: 2),
+          borderSide: BorderSide(color: primaryColor, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
@@ -142,4 +175,24 @@ abstract final class AppTheme {
       ),
     );
   }
+}
+
+/// Riverpod provider for light theme config dynamically synced with settings.
+@riverpod
+ThemeData lightTheme(LightThemeRef ref) {
+  final settings = ref.watch(playerSettingsProvider);
+  return AppTheme.buildTheme(
+    brightness: Brightness.light,
+    accentName: settings.accentColor,
+  );
+}
+
+/// Riverpod provider for dark theme config dynamically synced with settings.
+@riverpod
+ThemeData darkTheme(DarkThemeRef ref) {
+  final settings = ref.watch(playerSettingsProvider);
+  return AppTheme.buildTheme(
+    brightness: Brightness.dark,
+    accentName: settings.accentColor,
+  );
 }

@@ -26,4 +26,7 @@ abstract final class AppConstants {
 
   /// Key for player avatar URL.
   static const String playerAvatarUrlKey = 'player_avatar_url';
+
+  /// Key for player data JSON object.
+  static const String playerKey = 'player_data';
 }

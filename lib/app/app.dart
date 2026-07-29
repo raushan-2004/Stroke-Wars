@@ -15,6 +15,8 @@ class StrokeWarsApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(appRouterProvider);
     final themeMode = ref.watch(themeModeProvider);
+    final lightThemeData = ref.watch(lightThemeProvider);
+    final darkThemeData = ref.watch(darkThemeProvider);
 
     return ScreenUtilInit(
       designSize: const Size(390, 844),
@@ -24,8 +26,8 @@ class StrokeWarsApp extends ConsumerWidget {
         return MaterialApp.router(
           title: 'Stroke Wars',
           debugShowCheckedModeBanner: false,
-          theme: AppTheme.lightTheme,
-          darkTheme: AppTheme.darkTheme,
+          theme: lightThemeData,
+          darkTheme: darkThemeData,
           themeMode: themeMode,
           routerConfig: router,
         );

@@ -20,6 +20,7 @@ export 'tokens/sw_tokens.dart';
 export 'tokens/sw_typography.dart';
 // Components - Avatars
 export 'widgets/avatars/avatar.dart';
+export 'widgets/avatars/avatar_framework.dart';
 export 'widgets/avatars/avatar_ring.dart';
 // Components - Buttons
 export 'widgets/buttons/sw_button.dart';

@@ -1,9 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:stroke_wars/shared/design_language/tokens/sw_radius.dart';
 import 'package:stroke_wars/shared/design_language/tokens/sw_sizes.dart';
 import 'package:stroke_wars/shared/design_language/tokens/sw_theme_extension.dart';
+import 'package:stroke_wars/shared/design_language/widgets/avatars/avatar_framework.dart';
 
 /// Supported avatar size variants.
 enum SWAvatarSize {
@@ -24,6 +27,9 @@ class SWAvatar extends StatelessWidget {
     required this.name,
     super.key,
     this.avatarUrl,
+    this.profilePicturePath,
+    this.avatarId,
+    this.avatarFrameId,
     this.size = SWAvatarSize.medium,
     this.backgroundColor,
   });
@@ -33,6 +39,15 @@ class SWAvatar extends StatelessWidget {
 
   /// Optional avatar remote image URL.
   final String? avatarUrl;
+
+  /// Optional local disk photo image path.
+  final String? profilePicturePath;
+
+  /// Optional built-in vector avatar ID mapping.
+  final String? avatarId;
+
+  /// Optional cosmetic frame ID mapping.
+  final String? avatarFrameId;
 
   /// Display size variant.
   final SWAvatarSize size;
@@ -62,9 +77,41 @@ class SWAvatar extends StatelessWidget {
       letterSpacing: 0,
     );
 
-    final bg = backgroundColor ?? colors.surfaceContainerHighest;
+    // Dynamic resolution of image widget
+    Widget? imageWidget;
 
-    return Container(
+    if (profilePicturePath != null && profilePicturePath!.isNotEmpty) {
+      final file = File(profilePicturePath!);
+      if (file.existsSync()) {
+        imageWidget = Image.file(
+          file,
+          fit: BoxFit.cover,
+          width: diameter,
+          height: diameter,
+        );
+      }
+    }
+
+    if (imageWidget == null && avatarUrl != null && avatarUrl!.isNotEmpty) {
+      imageWidget = Image.network(
+        avatarUrl!,
+        fit: BoxFit.cover,
+        width: diameter,
+        height: diameter,
+        errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
+      );
+    }
+
+    // Default built-in vector icon lookup
+    final builtInDef = avatarId != null
+        ? AvatarFramework.findAvatar(avatarId!)
+        : null;
+    final bg =
+        backgroundColor ??
+        builtInDef?.color.withValues(alpha: 0.15) ??
+        colors.surfaceContainerHighest;
+
+    Widget coreAvatar = Container(
       width: diameter,
       height: diameter,
       decoration: BoxDecoration(
@@ -74,15 +121,43 @@ class SWAvatar extends StatelessWidget {
       ),
       child: ClipRRect(
         borderRadius: SWRadius.circular,
-        child: avatarUrl != null && avatarUrl!.isNotEmpty
-            ? Image.network(
-                avatarUrl!,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) =>
-                    Center(child: Text(initials, style: textStyle)),
-              )
-            : Center(child: Text(initials, style: textStyle)),
+        child:
+            imageWidget ??
+            (builtInDef != null
+                ? Icon(
+                    builtInDef.icon,
+                    size: (diameter * 0.55).r,
+                    color: builtInDef.color,
+                  )
+                : Center(child: Text(initials, style: textStyle))),
       ),
     );
+
+    // Apply avatar cosmetic frames
+    final frameDef = avatarFrameId != null
+        ? AvatarFramework.findFrame(avatarFrameId!)
+        : null;
+    if (frameDef != null && frameDef.id != 'none') {
+      coreAvatar = Container(
+        padding: EdgeInsets.all(frameDef.borderWidth.r),
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: frameDef.glowColor,
+            width: frameDef.borderWidth.r,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: frameDef.glowColor.withValues(alpha: 0.3),
+              blurRadius: 8.r,
+              spreadRadius: 1.r,
+            ),
+          ],
+        ),
+        child: coreAvatar,
+      );
+    }
+
+    return coreAvatar;
   }
 }

@@ -4,6 +4,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:stroke_wars/core/constants/app_constants.dart';
 import 'package:stroke_wars/core/services/logger_service.dart';
 import 'package:stroke_wars/core/storage/hive_storage_service.dart';
+import 'package:stroke_wars/features/profile/application/player_service.dart';
 
 part 'theme_service.g.dart';
 
@@ -15,16 +16,27 @@ part 'theme_service.g.dart';
 class ThemeModeNotifier extends _$ThemeModeNotifier {
   @override
   ThemeMode build() {
-    final storage = ref.watch(storageServiceProvider);
-    final stored = storage.get<String>(AppConstants.themePreferenceKey);
-    return _themeFromString(stored);
+    final settings = ref.watch(playerSettingsProvider);
+    return _themeFromString(settings.themeMode);
   }
 
   /// Switches to the specified [ThemeMode] and persists the choice.
   Future<void> setThemeMode(ThemeMode mode) async {
     state = mode;
-    final storage = ref.read(storageServiceProvider);
-    await storage.put(AppConstants.themePreferenceKey, _themeToString(mode));
+    final playerService = ref.read(playerServiceProvider.notifier);
+    final player = ref.read(playerServiceProvider);
+
+    if (player != null) {
+      final updatedPlayer = player.copyWith(
+        settings: player.settings.copyWith(themeMode: _themeToString(mode)),
+        cosmetics: player.cosmetics.copyWith(theme: _themeToString(mode)),
+      );
+      await playerService.updatePlayer(updatedPlayer);
+    } else {
+      // Direct storage update when player is not yet constructed (first launch setup flow)
+      final storage = ref.read(storageServiceProvider);
+      await storage.put(AppConstants.themePreferenceKey, _themeToString(mode));
+    }
     AppLogger.instance.info('Theme mode changed to: $mode');
   }
 
