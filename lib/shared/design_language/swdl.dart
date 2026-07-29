@@ -22,10 +22,12 @@ export 'tokens/sw_typography.dart';
 export 'widgets/avatars/avatar.dart';
 export 'widgets/avatars/avatar_framework.dart';
 export 'widgets/avatars/avatar_ring.dart';
+export 'widgets/avatars/player_summary.dart';
 // Components - Buttons
 export 'widgets/buttons/sw_button.dart';
 // Components - Cards
 export 'widgets/cards/achievement_card.dart';
+export 'widgets/cards/dashboard_card.dart';
 export 'widgets/cards/glass_card.dart';
 export 'widgets/cards/room_code_card.dart';
 export 'widgets/cards/stat_card.dart';
@@ -62,6 +64,7 @@ export 'widgets/inputs/text_field.dart';
 export 'widgets/inputs/toggle.dart';
 // Components - Layout
 export 'widgets/layout/bottom_sheet.dart';
+export 'widgets/layout/dashboard_section.dart';
 export 'widgets/layout/dialog.dart';
 export 'widgets/layout/list_tile.dart';
 export 'widgets/layout/section_header.dart';

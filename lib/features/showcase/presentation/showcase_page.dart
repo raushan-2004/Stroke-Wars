@@ -10,15 +10,15 @@ import 'package:stroke_wars/shared/design_language/swdl.dart';
 ///
 /// Serves as a dynamic sandbox/storybook to test and preview all design system
 /// tokens, components, and animations.
-class HomePage extends ConsumerStatefulWidget {
-  /// Creates a [HomePage].
-  const HomePage({super.key});
+class ShowcasePage extends ConsumerStatefulWidget {
+  /// Creates a [ShowcasePage].
+  const ShowcasePage({super.key});
 
   @override
-  ConsumerState<HomePage> createState() => _HomePageState();
+  ConsumerState<ShowcasePage> createState() => _ShowcasePageState();
 }
 
-class _HomePageState extends ConsumerState<HomePage> {
+class _ShowcasePageState extends ConsumerState<ShowcasePage> {
   // Input states
   final _textController = TextEditingController();
   bool _toggleVal = false;
