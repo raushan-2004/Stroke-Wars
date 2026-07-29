@@ -1,0 +1,76 @@
+name: stroke_wars
+description: "A premium real-time multiplayer drawing game."
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.12.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # State Management
+  flutter_riverpod: ^2.6.1
+  riverpod_annotation: ^2.6.1
+
+  # Navigation
+  go_router: ^14.6.3
+
+  # Local Storage
+  hive_flutter: ^1.1.0
+  hive: ^2.2.3
+
+  # Responsive UI
+  flutter_screenutil: ^5.9.3
+
+  # Immutable Models
+  freezed_annotation: ^2.4.4
+  json_annotation: ^4.9.0
+
+  # Typography
+  google_fonts: ^6.2.1
+
+  # Animations
+  rive: ^0.13.19
+  lottie: ^3.1.3
+
+  # SVG
+  flutter_svg: ^2.0.17
+
+  # Media
+  image_picker: ^1.1.2
+
+  # Permissions
+  permission_handler: ^11.3.1
+
+  # App Info
+  package_info_plus: ^8.3.0
+
+  # Connectivity
+  connectivity_plus: ^6.1.3
+
+  # Logging
+  logger: ^2.5.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  # Linting
+  very_good_analysis: ^7.0.0
+
+  # Code Generation
+  build_runner: any
+  riverpod_generator: any
+  freezed: any
+  json_serializable: any
+  hive_generator: any
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/
+    - assets/icons/
+    - assets/animations/
+    - assets/audio/

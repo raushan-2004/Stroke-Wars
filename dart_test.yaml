@@ -1,0 +1,3 @@
+tags:
+  integration-test:
+    timeout: 120s
