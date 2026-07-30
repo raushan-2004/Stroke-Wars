@@ -19,9 +19,7 @@ class Word {
     difficulty: WordDifficulty.values.firstWhere(
       (d) => d.name == json['difficulty'],
     ),
-    category: WordCategory.values.firstWhere(
-      (c) => c.name == json['category'],
-    ),
+    category: WordCategory.values.firstWhere((c) => c.name == json['category']),
     hints: (json['hints'] as List<dynamic>).cast<String>(),
   );
 
@@ -41,7 +39,8 @@ class Word {
   final List<String> hints;
 
   /// Returns a masked version of the text (e.g. "_ _ _ _") for display.
-  String get masked => text.split('').map((c) => c == ' ' ? ' ' : '_').join(' ');
+  String get masked =>
+      text.split('').map((c) => c == ' ' ? ' ' : '_').join(' ');
 
   /// Returns a partial reveal of the word showing [revealCount] random letters.
   String partialReveal(int revealCount) {

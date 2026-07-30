@@ -53,22 +53,26 @@ class Room {
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id.value,
-        'configuration': configuration.toJson(),
-        'state': state.name,
-        'host': host.toJson(),
-        'players': players.map((p) => p.toJson()).toList(),
-        'matchId': matchId?.value,
-      };
+    'id': id.value,
+    'configuration': configuration.toJson(),
+    'state': state.name,
+    'host': host.toJson(),
+    'players': players.map((p) => p.toJson()).toList(),
+    'matchId': matchId?.value,
+  };
 
   factory Room.fromJson(Map<String, dynamic> json) => Room(
-        id: RoomId(json['id'] as String),
-        configuration: RoomConfiguration.fromJson(json['configuration'] as Map<String, dynamic>),
-        state: RoomState.values.byName(json['state'] as String),
-        host: PeerInfo.fromJson(json['host'] as Map<String, dynamic>),
-        players: (json['players'] as List<dynamic>)
-            .map((p) => PlayerConnection.fromJson(p as Map<String, dynamic>))
-            .toList(),
-        matchId: json['matchId'] != null ? MatchId(json['matchId'] as String) : null,
-      );
+    id: RoomId(json['id'] as String),
+    configuration: RoomConfiguration.fromJson(
+      json['configuration'] as Map<String, dynamic>,
+    ),
+    state: RoomState.values.byName(json['state'] as String),
+    host: PeerInfo.fromJson(json['host'] as Map<String, dynamic>),
+    players: (json['players'] as List<dynamic>)
+        .map((p) => PlayerConnection.fromJson(p as Map<String, dynamic>))
+        .toList(),
+    matchId: json['matchId'] != null
+        ? MatchId(json['matchId'] as String)
+        : null,
+  );
 }

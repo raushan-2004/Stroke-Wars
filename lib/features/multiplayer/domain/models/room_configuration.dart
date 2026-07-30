@@ -48,20 +48,23 @@ class RoomConfiguration {
   }
 
   Map<String, dynamic> toJson() => {
-        'name': name,
-        'description': description,
-        'maxPlayers': maxPlayers,
-        'isPrivate': isPrivate,
-        'port': port,
-        'matchConfiguration': matchConfiguration.toJson(),
-      };
+    'name': name,
+    'description': description,
+    'maxPlayers': maxPlayers,
+    'isPrivate': isPrivate,
+    'port': port,
+    'matchConfiguration': matchConfiguration.toJson(),
+  };
 
-  factory RoomConfiguration.fromJson(Map<String, dynamic> json) => RoomConfiguration(
+  factory RoomConfiguration.fromJson(Map<String, dynamic> json) =>
+      RoomConfiguration(
         name: json['name'] as String,
         description: json['description'] as String? ?? '',
         maxPlayers: json['maxPlayers'] as int? ?? 8,
         isPrivate: json['isPrivate'] as bool? ?? false,
         port: json['port'] as int? ?? 18080,
-        matchConfiguration: MatchConfiguration.fromJson(json['matchConfiguration'] as Map<String, dynamic>),
+        matchConfiguration: MatchConfiguration.fromJson(
+          json['matchConfiguration'] as Map<String, dynamic>,
+        ),
       );
 }

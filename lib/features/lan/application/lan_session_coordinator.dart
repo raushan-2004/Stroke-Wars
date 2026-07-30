@@ -77,14 +77,17 @@ class LANSessionCoordinator {
   StreamSubscription? _matchStateSub;
 
   LANSession get session => _session;
-  Stream<List<DiscoveredRoom>> get discoveredRooms => _discoveredRoomsController.stream;
+  Stream<List<DiscoveredRoom>> get discoveredRooms =>
+      _discoveredRoomsController.stream;
 
   void _initDiscovery() {
     _discoveryService = PeerDiscoveryService();
     _discoverySub = _discoveryService!.discoveredRooms.listen((rooms) {
       _discoveredRooms.clear();
       _discoveredRooms.addAll(rooms);
-      _discoveredRoomsController.add(List<DiscoveredRoom>.from(_discoveredRooms));
+      _discoveredRoomsController.add(
+        List<DiscoveredRoom>.from(_discoveredRooms),
+      );
     });
     _discoveryService!.startBrowsing();
   }
@@ -99,10 +102,12 @@ class LANSessionCoordinator {
     await _cleanupActiveSession();
     _syncManager.reset();
 
-    _updateSession(_session.copyWith(
-      sessionState: LANSessionLifecycleState.joining,
-      connectionState: NetworkConnectionState.connecting,
-    ));
+    _updateSession(
+      _session.copyWith(
+        sessionState: LANSessionLifecycleState.joining,
+        connectionState: NetworkConnectionState.connecting,
+      ),
+    );
 
     try {
       _transport = LocalNetworkTransport(isHost: true);
@@ -112,7 +117,9 @@ class LANSessionCoordinator {
       _connectionManager = ConnectionManager(
         transport: _transport!,
         serializer: serializer,
-        sessionId: SessionId('session-${DateTime.now().millisecondsSinceEpoch}'),
+        sessionId: SessionId(
+          'session-${DateTime.now().millisecondsSinceEpoch}',
+        ),
         localConnectionId: const ConnectionId('host-conn'),
         isHost: true,
       );
@@ -139,9 +146,7 @@ class LANSessionCoordinator {
         hostInfo,
         RoomConfiguration(
           name: roomName,
-          matchConfiguration: MatchConfiguration(
-            maxPlayers: maxPlayers,
-          ),
+          matchConfiguration: MatchConfiguration(maxPlayers: maxPlayers),
         ),
       );
 
@@ -156,47 +161,57 @@ class LANSessionCoordinator {
       );
 
       _roomSub = _hostController!.onRoomChanged.listen(_onRoomChanged);
-      _connStateSub = _connectionManager!.connectionState.listen(_onConnectionStateChanged);
-      _statsSub = _connectionManager!.onStatisticsChanged.listen(_onStatsChanged);
+      _connStateSub = _connectionManager!.connectionState.listen(
+        _onConnectionStateChanged,
+      );
+      _statsSub = _connectionManager!.onStatisticsChanged.listen(
+        _onStatsChanged,
+      );
 
       // Bind match controller game state listener to sync lifecycle shifts
-      _matchStateSub = matchEventBus.stream.listen((_) => _onMatchChanged(matchController.match));
+      _matchStateSub = matchEventBus.stream.listen(
+        (_) => _onMatchChanged(matchController.match),
+      );
 
       // Initialize match aggregate authoritatively on host
       matchController.match = Match(
         id: MatchId('match-${DateTime.now().millisecondsSinceEpoch}'),
         hostId: 'host',
-        configuration: MatchConfiguration(
-          maxPlayers: maxPlayers,
-        ),
+        configuration: MatchConfiguration(maxPlayers: maxPlayers),
         players: const [],
         rounds: const [],
         state: const MatchCreatedState(),
         createdAt: DateTime.now(),
       );
       // Join host automatically to the match
-      commandProcessor.process(JoinMatchCommand(
-        matchId: matchController.match!.id,
-        playerId: 'host',
-        displayName: hostName,
-      ));
+      commandProcessor.process(
+        JoinMatchCommand(
+          matchId: matchController.match!.id,
+          playerId: 'host',
+          displayName: hostName,
+        ),
+      );
 
-      _updateSession(_session.copyWith(
-        room: () => _hostController!.room,
-        players: _hostController!.room?.players ?? const [],
-        connectionState: NetworkConnectionState.connected,
-        connectionQuality: ConnectionQuality.excellent,
-        synchronizationState: SynchronizationState.synchronized,
-        sessionState: LANSessionLifecycleState.lobby,
-        currentMatch: () => matchController.match,
-        canvasState: canvasController.state,
-      ));
+      _updateSession(
+        _session.copyWith(
+          room: () => _hostController!.room,
+          players: _hostController!.room?.players ?? const [],
+          connectionState: NetworkConnectionState.connected,
+          connectionQuality: ConnectionQuality.excellent,
+          synchronizationState: SynchronizationState.synchronized,
+          sessionState: LANSessionLifecycleState.lobby,
+          currentMatch: () => matchController.match,
+          canvasState: canvasController.state,
+        ),
+      );
     } catch (e) {
       AppLogger.instance.error('LANSessionCoordinator failed hosting game: $e');
-      _updateSession(_session.copyWith(
-        sessionState: LANSessionLifecycleState.disconnected,
-        connectionState: NetworkConnectionState.failed,
-      ));
+      _updateSession(
+        _session.copyWith(
+          sessionState: LANSessionLifecycleState.disconnected,
+          connectionState: NetworkConnectionState.failed,
+        ),
+      );
     }
   }
 
@@ -209,10 +224,12 @@ class LANSessionCoordinator {
     await _cleanupActiveSession();
     _syncManager.reset();
 
-    _updateSession(_session.copyWith(
-      sessionState: LANSessionLifecycleState.joining,
-      connectionState: NetworkConnectionState.connecting,
-    ));
+    _updateSession(
+      _session.copyWith(
+        sessionState: LANSessionLifecycleState.joining,
+        connectionState: NetworkConnectionState.connecting,
+      ),
+    );
 
     try {
       _transport = LocalNetworkTransport(isHost: false);
@@ -222,7 +239,9 @@ class LANSessionCoordinator {
       _connectionManager = ConnectionManager(
         transport: _transport!,
         serializer: serializer,
-        sessionId: SessionId('session-${DateTime.now().millisecondsSinceEpoch}'),
+        sessionId: SessionId(
+          'session-${DateTime.now().millisecondsSinceEpoch}',
+        ),
         localConnectionId: ConnectionId(localPeerId),
         isHost: false,
       );
@@ -243,17 +262,25 @@ class LANSessionCoordinator {
       );
 
       _roomSub = _clientController!.onRoomChanged.listen(_onRoomChanged);
-      _connStateSub = _connectionManager!.connectionState.listen(_onConnectionStateChanged);
-      _statsSub = _connectionManager!.onStatisticsChanged.listen(_onStatsChanged);
-      _matchStateSub = matchEventBus.stream.listen((_) => _onMatchChanged(matchController.match));
+      _connStateSub = _connectionManager!.connectionState.listen(
+        _onConnectionStateChanged,
+      );
+      _statsSub = _connectionManager!.onStatisticsChanged.listen(
+        _onStatsChanged,
+      );
+      _matchStateSub = matchEventBus.stream.listen(
+        (_) => _onMatchChanged(matchController.match),
+      );
 
       await _clientController!.joinRoom(address, port, localPeer);
     } catch (e) {
       AppLogger.instance.error('LANSessionCoordinator failed joining game: $e');
-      _updateSession(_session.copyWith(
-        sessionState: LANSessionLifecycleState.disconnected,
-        connectionState: NetworkConnectionState.failed,
-      ));
+      _updateSession(
+        _session.copyWith(
+          sessionState: LANSessionLifecycleState.disconnected,
+          connectionState: NetworkConnectionState.failed,
+        ),
+      );
     }
   }
 
@@ -265,14 +292,18 @@ class LANSessionCoordinator {
     if (_hostController != null) {
       _hostController!.handleReadyToggle('host', isReady);
     } else if (_clientController != null) {
-      await _connectionManager!.sendPayload(ReadyMessage(peerId: connId, isReady: isReady));
+      await _connectionManager!.sendPayload(
+        ReadyMessage(peerId: connId, isReady: isReady),
+      );
     }
   }
 
   /// Host starts the match gameplay.
   Future<void> startMatch() async {
     if (_hostController == null) return;
-    commandProcessor.process(StartMatchCommand(matchId: matchController.match!.id, hostId: 'host'));
+    commandProcessor.process(
+      StartMatchCommand(matchId: matchController.match!.id, hostId: 'host'),
+    );
   }
 
   /// Sends a canvas drawing event to the host authority.
@@ -307,21 +338,22 @@ class LANSessionCoordinator {
     if (_hostController != null) {
       await _discoveryService!.stopAdvertising();
       // Inform all clients of room closure
-      _connectionManager!.sendPayload(LeaveRoomMessage(peerId: 'host', reason: 'Host closed lobby'));
+      _connectionManager!.sendPayload(
+        LeaveRoomMessage(peerId: 'host', reason: 'Host closed lobby'),
+      );
     } else if (_clientController != null) {
       await _clientController!.leaveRoom(playerVal);
     }
     await _cleanupActiveSession();
-    _updateSession(LANSession.initial().copyWith(
-      sessionState: LANSessionLifecycleState.closed,
-    ));
+    _updateSession(
+      LANSession.initial().copyWith(
+        sessionState: LANSessionLifecycleState.closed,
+      ),
+    );
   }
 
   void _onRoomChanged(Room room) {
-    _updateSession(_session.copyWith(
-      room: () => room,
-      players: room.players,
-    ));
+    _updateSession(_session.copyWith(room: () => room, players: room.players));
   }
 
   void _onConnectionStateChanged(NetworkConnectionState state) {
@@ -333,18 +365,19 @@ class LANSessionCoordinator {
       lifeState = LANSessionLifecycleState.lobby;
     }
 
-    _updateSession(_session.copyWith(
-      connectionState: state,
-      sessionState: lifeState,
-    ));
+    _updateSession(
+      _session.copyWith(connectionState: state, sessionState: lifeState),
+    );
   }
 
   void _onStatsChanged(NetworkStatistics stats) {
     _syncManager.updateLatency(stats.latencyMs);
-    _updateSession(_session.copyWith(
-      networkStatistics: stats,
-      connectionQuality: ConnectionQuality.fromLatency(stats.latencyMs),
-    ));
+    _updateSession(
+      _session.copyWith(
+        networkStatistics: stats,
+        connectionQuality: ConnectionQuality.fromLatency(stats.latencyMs),
+      ),
+    );
   }
 
   void _onMatchChanged(Match? match) {
@@ -358,23 +391,28 @@ class LANSessionCoordinator {
 
     if (matchState is MatchWaitingState || matchState is MatchStartingState) {
       lifeState = LANSessionLifecycleState.lobby;
-    } else if (matchState is MatchFinishedState || matchState is MatchCancelledState) {
+    } else if (matchState is MatchFinishedState ||
+        matchState is MatchCancelledState) {
       lifeState = LANSessionLifecycleState.results;
     } else if (matchState.isActive) {
       lifeState = LANSessionLifecycleState.playing;
     }
 
-    _updateSession(_session.copyWith(
-      currentMatch: () => match,
-      sessionState: lifeState,
-    ));
+    _updateSession(
+      _session.copyWith(currentMatch: () => match, sessionState: lifeState),
+    );
   }
 
-  void _onSyncStateChanged(SynchronizationState syncState, SynchronizationDiagnostics diagnostics) {
-    _updateSession(_session.copyWith(
-      synchronizationState: syncState,
-      diagnostics: diagnostics,
-    ));
+  void _onSyncStateChanged(
+    SynchronizationState syncState,
+    SynchronizationDiagnostics diagnostics,
+  ) {
+    _updateSession(
+      _session.copyWith(
+        synchronizationState: syncState,
+        diagnostics: diagnostics,
+      ),
+    );
   }
 
   void _updateSession(LANSession newSession) {

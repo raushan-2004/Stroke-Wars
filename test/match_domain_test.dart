@@ -79,7 +79,10 @@ void main() {
 
       test('partialReveal reveals the requested number of characters', () {
         final result = word.partialReveal(3);
-        final revealed = result.split(' ').where((c) => c.length == 1 && c != '_').length;
+        final revealed = result
+            .split(' ')
+            .where((c) => c.length == 1 && c != '_')
+            .length;
         expect(revealed, 3);
       });
 
@@ -93,9 +96,18 @@ void main() {
       });
 
       test('WordDifficulty multipliers are ordered', () {
-        expect(WordDifficulty.easy.pointMultiplier, lessThan(WordDifficulty.medium.pointMultiplier));
-        expect(WordDifficulty.medium.pointMultiplier, lessThan(WordDifficulty.hard.pointMultiplier));
-        expect(WordDifficulty.hard.pointMultiplier, lessThan(WordDifficulty.extreme.pointMultiplier));
+        expect(
+          WordDifficulty.easy.pointMultiplier,
+          lessThan(WordDifficulty.medium.pointMultiplier),
+        );
+        expect(
+          WordDifficulty.medium.pointMultiplier,
+          lessThan(WordDifficulty.hard.pointMultiplier),
+        );
+        expect(
+          WordDifficulty.hard.pointMultiplier,
+          lessThan(WordDifficulty.extreme.pointMultiplier),
+        );
       });
     });
 
@@ -449,9 +461,7 @@ void main() {
       test('connectedPlayers filters disconnected slots', () {
         final match = buildMatch();
         final disconnected = slots[1].copyWith(isConnected: false);
-        final updated = match.copyWith(
-          players: [slots[0], disconnected],
-        );
+        final updated = match.copyWith(players: [slots[0], disconnected]);
         expect(updated.connectedPlayers.length, 1);
       });
 
@@ -576,9 +586,24 @@ void main() {
     group('Round', () {
       test('correctGuessCount counts only correct guesses', () {
         final guesses = [
-          Guess(playerId: 'p1', text: 'right', submittedAt: DateTime(2026), result: GuessResult.correct),
-          Guess(playerId: 'p2', text: 'wrong', submittedAt: DateTime(2026), result: GuessResult.incorrect),
-          Guess(playerId: 'p3', text: 'right', submittedAt: DateTime(2026), result: GuessResult.correct),
+          Guess(
+            playerId: 'p1',
+            text: 'right',
+            submittedAt: DateTime(2026),
+            result: GuessResult.correct,
+          ),
+          Guess(
+            playerId: 'p2',
+            text: 'wrong',
+            submittedAt: DateTime(2026),
+            result: GuessResult.incorrect,
+          ),
+          Guess(
+            playerId: 'p3',
+            text: 'right',
+            submittedAt: DateTime(2026),
+            result: GuessResult.correct,
+          ),
         ];
         final round = Round(
           id: RoundId.generate(),

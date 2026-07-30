@@ -34,11 +34,13 @@ class ClientController {
     required this.canvasController,
     required this.matchEventBus,
     SynchronizationManager? synchronizationManager,
-  }) : synchronizationManager = synchronizationManager ?? SynchronizationManager(
-          matchController: matchController,
-          canvasController: canvasController,
-          onStateChanged: (_, __) {},
-        ) {
+  }) : synchronizationManager =
+           synchronizationManager ??
+           SynchronizationManager(
+             matchController: matchController,
+             canvasController: canvasController,
+             onStateChanged: (_, __) {},
+           ) {
     _init();
   }
 
@@ -49,7 +51,8 @@ class ClientController {
   final SynchronizationManager synchronizationManager;
 
   Room? _room;
-  final StreamController<Room> _roomStreamController = StreamController<Room>.broadcast();
+  final StreamController<Room> _roomStreamController =
+      StreamController<Room>.broadcast();
 
   StreamSubscription<NetworkEnvelope>? _inboundMessageSub;
   StreamSubscription<NetworkConnectionState>? _connectionStateSub;
@@ -58,11 +61,16 @@ class ClientController {
 
   Room? get room => _room;
   Stream<Room> get onRoomChanged => _roomStreamController.stream;
-  Stream<NetworkConnectionState> get connectionState => connectionManager.connectionState;
+  Stream<NetworkConnectionState> get connectionState =>
+      connectionManager.connectionState;
 
   void _init() {
-    _inboundMessageSub = connectionManager.inboundMessages.listen(_handleInboundMessage);
-    _connectionStateSub = connectionManager.connectionState.listen(_handleConnectionStateChange);
+    _inboundMessageSub = connectionManager.inboundMessages.listen(
+      _handleInboundMessage,
+    );
+    _connectionStateSub = connectionManager.connectionState.listen(
+      _handleConnectionStateChange,
+    );
   }
 
   /// Sends a request to join a remote multiplayer room.
@@ -87,13 +95,15 @@ class ClientController {
     final oldRoom = _room;
     _room = null;
     if (oldRoom != null) {
-      _roomStreamController.add(Room(
-        id: oldRoom.id,
-        configuration: oldRoom.configuration,
-        state: RoomState.closed,
-        host: oldRoom.host,
-        players: const [],
-      ));
+      _roomStreamController.add(
+        Room(
+          id: oldRoom.id,
+          configuration: oldRoom.configuration,
+          state: RoomState.closed,
+          host: oldRoom.host,
+          players: const [],
+        ),
+      );
     }
   }
 
@@ -117,7 +127,8 @@ class ClientController {
         message: msg,
         isHost: false,
         activeDrawerId: matchController.match?.currentRound?.drawerSlotId,
-        roomPlayerIds: _room?.players.map((p) => p.peerInfo.id.value).toList() ?? const [],
+        roomPlayerIds:
+            _room?.players.map((p) => p.peerInfo.id.value).toList() ?? const [],
         connectionIdToPlayerIdMap: const {},
       );
 
@@ -133,7 +144,9 @@ class ClientController {
         // Disconnected/Kicked by host
         connectionManager.disconnect();
       } else if (msg is ErrorMessage) {
-        AppLogger.instance.error('Received Error from Host: [${msg.code}] ${msg.message}');
+        AppLogger.instance.error(
+          'Received Error from Host: [${msg.code}] ${msg.message}',
+        );
       }
     } catch (e) {
       AppLogger.instance.error('ClientController error processing payload: $e');

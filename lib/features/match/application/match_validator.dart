@@ -54,7 +54,11 @@ class MatchValidator {
     WordSelectionState: {DrawingState, MatchCancelledState},
     DrawingState: {GuessingState, RoundFinishedState, MatchCancelledState},
     GuessingState: {RoundFinishedState, MatchCancelledState},
-    RoundFinishedState: {ScoreboardState, MatchFinishedState, MatchCancelledState},
+    RoundFinishedState: {
+      ScoreboardState,
+      MatchFinishedState,
+      MatchCancelledState,
+    },
     ScoreboardState: {
       WordSelectionState, // next round
       MatchFinishedState,
@@ -77,9 +81,7 @@ class MatchValidator {
       return const ValidationResult.fail('minPlayers must be at least 2');
     }
     if (config.minPlayers > config.maxPlayers) {
-      return const ValidationResult.fail(
-        'minPlayers cannot exceed maxPlayers',
-      );
+      return const ValidationResult.fail('minPlayers cannot exceed maxPlayers');
     }
     if (config.totalRounds < 1) {
       return const ValidationResult.fail('totalRounds must be at least 1');
@@ -100,9 +102,7 @@ class MatchValidator {
       return const ValidationResult.fail('wordChoiceCount cannot exceed 5');
     }
     if (config.allowedCategories.isEmpty) {
-      return const ValidationResult.fail(
-        'allowedCategories must not be empty',
-      );
+      return const ValidationResult.fail('allowedCategories must not be empty');
     }
     return const ValidationResult.ok();
   }

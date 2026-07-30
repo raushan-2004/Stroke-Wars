@@ -76,17 +76,17 @@ class PracticeConfiguration {
 
   /// Converts this configuration to a JSON Map.
   Map<String, dynamic> toJson() => {
-        'rounds': rounds,
-        'botCount': botCount,
-        'difficulty': difficulty.name,
-        'categories': categories.map((c) => c.name).toList(),
-        'drawTimeSecs': drawTimeSecs,
-        'scoreboardTimeSecs': scoreboardTimeSecs,
-        'hintsEnabled': hintsEnabled,
-        'brushRestrictions': brushRestrictions,
-        'replayEnabled': replayEnabled,
-        'autosaveEnabled': autosaveEnabled,
-      };
+    'rounds': rounds,
+    'botCount': botCount,
+    'difficulty': difficulty.name,
+    'categories': categories.map((c) => c.name).toList(),
+    'drawTimeSecs': drawTimeSecs,
+    'scoreboardTimeSecs': scoreboardTimeSecs,
+    'hintsEnabled': hintsEnabled,
+    'brushRestrictions': brushRestrictions,
+    'replayEnabled': replayEnabled,
+    'autosaveEnabled': autosaveEnabled,
+  };
 
   /// Restores this configuration from a JSON Map.
   factory PracticeConfiguration.fromJson(Map<String, dynamic> json) =>
@@ -97,18 +97,22 @@ class PracticeConfiguration {
           (e) => e.name == json['difficulty'],
           orElse: () => WordDifficulty.easy,
         ),
-        categories: (json['categories'] as List<dynamic>?)
-                ?.map((c) => WordCategory.values.firstWhere(
-                      (e) => e.name == c,
-                      orElse: () => WordCategory.animals,
-                    ))
+        categories:
+            (json['categories'] as List<dynamic>?)
+                ?.map(
+                  (c) => WordCategory.values.firstWhere(
+                    (e) => e.name == c,
+                    orElse: () => WordCategory.animals,
+                  ),
+                )
                 .toList() ??
             const [WordCategory.animals, WordCategory.food],
         drawTimeSecs: json['drawTimeSecs'] as int? ?? 60,
         scoreboardTimeSecs: json['scoreboardTimeSecs'] as int? ?? 8,
         hintsEnabled: json['hintsEnabled'] as bool? ?? true,
-        brushRestrictions:
-            List<String>.from(json['brushRestrictions'] as List? ?? const []),
+        brushRestrictions: List<String>.from(
+          json['brushRestrictions'] as List? ?? const [],
+        ),
         replayEnabled: json['replayEnabled'] as bool? ?? true,
         autosaveEnabled: json['autosaveEnabled'] as bool? ?? true,
       );

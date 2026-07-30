@@ -42,14 +42,12 @@ class MatchSnapshot {
     matchId: MatchId(json['matchId'] as String),
     capturedAt: DateTime.parse(json['capturedAt'] as String),
     matchState: json['matchState'] as String,
-    players:
-        (json['players'] as List<dynamic>)
-            .map((p) => PlayerSlot.fromJson(p as Map<String, dynamic>))
-            .toList(),
-    rounds:
-        (json['rounds'] as List<dynamic>)
-            .map((r) => Round.fromJson(r as Map<String, dynamic>))
-            .toList(),
+    players: (json['players'] as List<dynamic>)
+        .map((p) => PlayerSlot.fromJson(p as Map<String, dynamic>))
+        .toList(),
+    rounds: (json['rounds'] as List<dynamic>)
+        .map((r) => Round.fromJson(r as Map<String, dynamic>))
+        .toList(),
     configuration: MatchConfiguration.fromJson(
       json['configuration'] as Map<String, dynamic>,
     ),

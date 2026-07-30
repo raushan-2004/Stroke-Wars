@@ -24,16 +24,29 @@ class LANLobbyPage extends ConsumerWidget {
     }
 
     final room = session.room!;
-    final localPlayerId = notifier.controller.matchController.match?.hostId == 'host' ? 'host' : player?.uuid ?? '';
-    final isHost = room.host.id.value == 'host' || room.host.id.value == localPlayerId;
+    final localPlayerId =
+        notifier.controller.matchController.match?.hostId == 'host'
+        ? 'host'
+        : player?.uuid ?? '';
+    final isHost =
+        room.host.id.value == 'host' || room.host.id.value == localPlayerId;
     final localPlayerConnection = session.players.firstWhere(
-      (p) => p.peerInfo.id.value == localPlayerId || p.peerInfo.id.value == 'host' && isHost,
-      orElse: () => session.players.isNotEmpty ? session.players.first : session.players.first,
+      (p) =>
+          p.peerInfo.id.value == localPlayerId ||
+          p.peerInfo.id.value == 'host' && isHost,
+      orElse: () => session.players.isNotEmpty
+          ? session.players.first
+          : session.players.first,
     );
     final isLocalReady = localPlayerConnection.isReady;
 
     // A match starts only if there are enough players and everyone (except host maybe) is ready
-    final canStart = isHost && room.players.length >= 2 && room.players.where((p) => p.peerInfo.id.value != 'host').every((p) => p.isReady);
+    final canStart =
+        isHost &&
+        room.players.length >= 2 &&
+        room.players
+            .where((p) => p.peerInfo.id.value != 'host')
+            .every((p) => p.isReady);
 
     return Center(
       child: SingleChildScrollView(
@@ -61,7 +74,9 @@ class LANLobbyPage extends ConsumerWidget {
                 SizedBox(width: spacing.sm),
                 Icon(
                   Icons.wifi_tethering_rounded,
-                  color: session.connectionQuality == ConnectionQuality.excellent ||
+                  color:
+                      session.connectionQuality ==
+                              ConnectionQuality.excellent ||
                           session.connectionQuality == ConnectionQuality.good
                       ? colors.success
                       : colors.warning,
@@ -82,7 +97,10 @@ class LANLobbyPage extends ConsumerWidget {
                       Text('Players', style: typography.heading),
                       Text(
                         '${room.players.length}/${room.configuration.maxPlayers}',
-                        style: typography.body.copyWith(fontWeight: FontWeight.bold, color: colors.textMuted),
+                        style: typography.body.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: colors.textMuted,
+                        ),
                       ),
                     ],
                   ),
@@ -94,7 +112,9 @@ class LANLobbyPage extends ConsumerWidget {
                     separatorBuilder: (_, __) => Divider(color: colors.border),
                     itemBuilder: (context, index) {
                       final conn = session.players[index];
-                      final isConnHost = conn.peerInfo.id.value == 'host' || conn.peerInfo.id.value == room.host.id.value;
+                      final isConnHost =
+                          conn.peerInfo.id.value == 'host' ||
+                          conn.peerInfo.id.value == room.host.id.value;
                       return ListTile(
                         leading: SWAvatar(
                           name: conn.peerInfo.displayName,
@@ -104,7 +124,12 @@ class LANLobbyPage extends ConsumerWidget {
                         ),
                         title: Row(
                           children: [
-                            Text(conn.peerInfo.displayName, style: typography.body.copyWith(fontWeight: FontWeight.bold)),
+                            Text(
+                              conn.peerInfo.displayName,
+                              style: typography.body.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                             if (isConnHost) ...[
                               SizedBox(width: spacing.xs),
                               SWBadge(label: 'Host', color: colors.primary),
@@ -114,12 +139,17 @@ class LANLobbyPage extends ConsumerWidget {
                         subtitle: Text(
                           conn.connectionState.name.toUpperCase(),
                           style: typography.caption.copyWith(
-                            color: conn.connectionState.name == 'connected' ? colors.success : colors.danger,
+                            color: conn.connectionState.name == 'connected'
+                                ? colors.success
+                                : colors.danger,
                           ),
                         ),
                         trailing: conn.isReady
                             ? SWBadge(label: 'Ready', color: colors.success)
-                            : SWBadge(label: 'Not Ready', color: colors.textMuted),
+                            : SWBadge(
+                                label: 'Not Ready',
+                                color: colors.textMuted,
+                              ),
                       );
                     },
                   ),
@@ -131,13 +161,32 @@ class LANLobbyPage extends ConsumerWidget {
             // DIAGNOSTICS CARD (COLLAPSIBLE FOR DEBUGGING ONLY)
             SWGlassCard(
               child: ExpansionTile(
-                title: Text('Diagnostics & Jitter', style: typography.body.copyWith(fontWeight: FontWeight.bold)),
+                title: Text(
+                  'Diagnostics & Jitter',
+                  style: typography.body.copyWith(fontWeight: FontWeight.bold),
+                ),
                 childrenPadding: EdgeInsets.all(spacing.sm.r),
                 children: [
-                  _buildDiagRow(context, 'Avg Latency', '${session.diagnostics.averageLatency.toStringAsFixed(1)} ms'),
-                  _buildDiagRow(context, 'Last Seq Received', session.diagnostics.lastSequenceReceived.toString()),
-                  _buildDiagRow(context, 'Last Snap Version', session.diagnostics.lastSnapshotVersion.toString()),
-                  _buildDiagRow(context, 'Sync Health State', session.synchronizationState.name.toUpperCase()),
+                  _buildDiagRow(
+                    context,
+                    'Avg Latency',
+                    '${session.diagnostics.averageLatency.toStringAsFixed(1)} ms',
+                  ),
+                  _buildDiagRow(
+                    context,
+                    'Last Seq Received',
+                    session.diagnostics.lastSequenceReceived.toString(),
+                  ),
+                  _buildDiagRow(
+                    context,
+                    'Last Snap Version',
+                    session.diagnostics.lastSnapshotVersion.toString(),
+                  ),
+                  _buildDiagRow(
+                    context,
+                    'Sync Health State',
+                    session.synchronizationState.name.toUpperCase(),
+                  ),
                 ],
               ),
             ),
@@ -158,7 +207,8 @@ class LANLobbyPage extends ConsumerWidget {
                   Expanded(
                     child: SWButton(
                       text: isLocalReady ? 'Cancel Ready' : 'Ready up',
-                      onPressed: () => notifier.controller.toggleReady(!isLocalReady),
+                      onPressed: () =>
+                          notifier.controller.toggleReady(!isLocalReady),
                       variant: SWButtonVariant.primary,
                     ),
                   ),
@@ -166,7 +216,9 @@ class LANLobbyPage extends ConsumerWidget {
                   Expanded(
                     child: SWButton(
                       text: 'Start Match',
-                      onPressed: canStart ? () => notifier.controller.startMatch() : null,
+                      onPressed: canStart
+                          ? () => notifier.controller.startMatch()
+                          : null,
                       variant: SWButtonVariant.primary,
                     ),
                   ),
@@ -186,8 +238,14 @@ class LANLobbyPage extends ConsumerWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(key, style: typography.caption.copyWith(color: colors.textMuted)),
-          Text(val, style: typography.caption.copyWith(fontWeight: FontWeight.bold)),
+          Text(
+            key,
+            style: typography.caption.copyWith(color: colors.textMuted),
+          ),
+          Text(
+            val,
+            style: typography.caption.copyWith(fontWeight: FontWeight.bold),
+          ),
         ],
       ),
     );

@@ -105,5 +105,6 @@ class UnexpectedCommandFailure extends MatchFailure {
   final String currentState;
 
   @override
-  String toString() => 'UnexpectedCommandFailure: $commandType in state $currentState';
+  String toString() =>
+      'UnexpectedCommandFailure: $commandType in state $currentState';
 }

@@ -39,7 +39,8 @@ class LANSessionController {
   final List<void Function(LANSession)> _listeners = [];
 
   LANSession get session => _coordinator.session;
-  Stream<List<DiscoveredRoom>> get discoveredRooms => _coordinator.discoveredRooms;
+  Stream<List<DiscoveredRoom>> get discoveredRooms =>
+      _coordinator.discoveredRooms;
 
   void addListener(void Function(LANSession) listener) {
     _listeners.add(listener);

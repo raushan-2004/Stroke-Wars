@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:stroke_wars/features/lan/providers/lan_providers.dart';
-import 'package:stroke_wars/features/match/domain/models/match.dart' as gameplay;
+import 'package:stroke_wars/features/match/domain/models/match.dart'
+    as gameplay;
 import 'package:stroke_wars/shared/design_language/swdl.dart';
 
 class LANResultsPage extends ConsumerWidget {
@@ -64,20 +65,31 @@ class LANResultsPage extends ConsumerWidget {
                       final isWinner = index == 0;
                       return ListTile(
                         leading: CircleAvatar(
-                          backgroundColor: isWinner ? colors.primary : colors.surfaceContainer,
+                          backgroundColor: isWinner
+                              ? colors.primary
+                              : colors.surfaceContainer,
                           child: Text(
                             '#${index + 1}',
                             style: typography.body.copyWith(
                               fontWeight: FontWeight.bold,
-                              color: isWinner ? Colors.white : colors.textPrimary,
+                              color: isWinner
+                                  ? Colors.white
+                                  : colors.textPrimary,
                             ),
                           ),
                         ),
-                        title: Text(p.displayName, style: typography.body.copyWith(fontWeight: FontWeight.bold)),
+                        title: Text(
+                          p.displayName,
+                          style: typography.body.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                         trailing: Text(
                           '${p.totalScore} PTS',
                           style: typography.heading.copyWith(
-                            color: isWinner ? colors.secondary : colors.textPrimary,
+                            color: isWinner
+                                ? colors.secondary
+                                : colors.textPrimary,
                             fontSize: 16.sp,
                           ),
                         ),

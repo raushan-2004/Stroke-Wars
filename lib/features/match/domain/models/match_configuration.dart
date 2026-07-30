@@ -39,9 +39,7 @@ class MatchConfiguration {
         ),
         allowedCategories:
             (json['allowedCategories'] as List<dynamic>?)
-                ?.map(
-                  (c) => WordCategory.values.firstWhere((v) => v.name == c),
-                )
+                ?.map((c) => WordCategory.values.firstWhere((v) => v.name == c))
                 .toList() ??
             WordCategory.values,
         wordChoiceCount: json['wordChoiceCount'] as int? ?? 3,
@@ -172,11 +170,6 @@ class MatchConfiguration {
       other.isPrivate == isPrivate;
 
   @override
-  int get hashCode => Object.hash(
-    maxPlayers,
-    totalRounds,
-    drawTimeSecs,
-    difficulty,
-    isPrivate,
-  );
+  int get hashCode =>
+      Object.hash(maxPlayers, totalRounds, drawTimeSecs, difficulty, isPrivate);
 }

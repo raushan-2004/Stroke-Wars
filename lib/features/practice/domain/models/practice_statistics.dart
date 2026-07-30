@@ -81,31 +81,33 @@ class PracticeStatistics {
 
   /// Converts statistics to a JSON Map.
   Map<String, dynamic> toJson() => {
-        'strokeCount': strokeCount,
-        'averageStrokeLength': averageStrokeLength,
-        'brushUsage': brushUsage,
-        'undoCount': undoCount,
-        'redoCount': redoCount,
-        'averageRoundDuration': averageRoundDuration,
-        'pauseCount': pauseCount,
-        'drawingDuration': drawingDuration,
-        'idleDuration': idleDuration,
-        'totalPointsPerStroke': totalPointsPerStroke,
-        'totalRoundsCompleted': totalRoundsCompleted,
-        'totalRoundTimeSecs': totalRoundTimeSecs,
-      };
+    'strokeCount': strokeCount,
+    'averageStrokeLength': averageStrokeLength,
+    'brushUsage': brushUsage,
+    'undoCount': undoCount,
+    'redoCount': redoCount,
+    'averageRoundDuration': averageRoundDuration,
+    'pauseCount': pauseCount,
+    'drawingDuration': drawingDuration,
+    'idleDuration': idleDuration,
+    'totalPointsPerStroke': totalPointsPerStroke,
+    'totalRoundsCompleted': totalRoundsCompleted,
+    'totalRoundTimeSecs': totalRoundTimeSecs,
+  };
 
   /// Restores statistics from a JSON Map.
   factory PracticeStatistics.fromJson(Map<String, dynamic> json) =>
       PracticeStatistics(
         strokeCount: json['strokeCount'] as int? ?? 0,
-        averageStrokeLength:
-            (json['averageStrokeLength'] as num? ?? 0.0).toDouble(),
-        brushUsage: Map<String, int>.from(json['brushUsage'] as Map? ?? const {}),
+        averageStrokeLength: (json['averageStrokeLength'] as num? ?? 0.0)
+            .toDouble(),
+        brushUsage: Map<String, int>.from(
+          json['brushUsage'] as Map? ?? const {},
+        ),
         undoCount: json['undoCount'] as int? ?? 0,
         redoCount: json['redoCount'] as int? ?? 0,
-        averageRoundDuration:
-            (json['averageRoundDuration'] as num? ?? 0.0).toDouble(),
+        averageRoundDuration: (json['averageRoundDuration'] as num? ?? 0.0)
+            .toDouble(),
         pauseCount: json['pauseCount'] as int? ?? 0,
         drawingDuration: (json['drawingDuration'] as num? ?? 0.0).toDouble(),
         idleDuration: (json['idleDuration'] as num? ?? 0.0).toDouble(),

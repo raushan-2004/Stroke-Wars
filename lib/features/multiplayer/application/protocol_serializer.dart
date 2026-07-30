@@ -25,7 +25,8 @@ class ProtocolSerializer {
   ///
   /// Throws [FormatException] if the packet is malformed.
   NetworkEnvelope decode(String rawJson) {
-    final Map<String, dynamic> data = jsonDecode(rawJson) as Map<String, dynamic>;
+    final Map<String, dynamic> data =
+        jsonDecode(rawJson) as Map<String, dynamic>;
     return NetworkEnvelope.fromJson(data);
   }
 

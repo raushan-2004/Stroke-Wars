@@ -43,8 +43,7 @@ class MatchResult {
 
   /// Returns an ordered list of (playerId, score) pairs, highest first.
   List<MapEntry<String, int>> get rankedScores =>
-      finalScores.entries.toList()
-        ..sort((a, b) => b.value.compareTo(a.value));
+      finalScores.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
 
   /// Returns the position (1-based) of the player with [playerId].
   int positionOf(String playerId) {

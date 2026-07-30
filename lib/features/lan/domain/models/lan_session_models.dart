@@ -25,12 +25,7 @@ enum ConnectionQuality {
 }
 
 /// Represents the synchronization health state between host and client.
-enum SynchronizationState {
-  synchronizing,
-  synchronized,
-  recovering,
-  outOfSync,
-}
+enum SynchronizationState { synchronizing, synchronized, recovering, outOfSync }
 
 /// Explicit lifecycle states for the LAN multiplayer session.
 enum LANSessionLifecycleState {
@@ -55,7 +50,8 @@ class SynchronizationDiagnostics {
     required this.averageLatency,
   });
 
-  factory SynchronizationDiagnostics.initial() => const SynchronizationDiagnostics(
+  factory SynchronizationDiagnostics.initial() =>
+      const SynchronizationDiagnostics(
         lastSequenceReceived: 0,
         lastSnapshotVersion: 0,
         pendingSnapshots: 0,
@@ -106,15 +102,15 @@ class LANSession {
   });
 
   factory LANSession.initial() => LANSession(
-        players: const [],
-        canvasState: CanvasState.initial(),
-        connectionState: NetworkConnectionState.disconnected,
-        networkStatistics: const NetworkStatistics(),
-        connectionQuality: ConnectionQuality.disconnected,
-        synchronizationState: SynchronizationState.outOfSync,
-        sessionState: LANSessionLifecycleState.discovering,
-        diagnostics: SynchronizationDiagnostics.initial(),
-      );
+    players: const [],
+    canvasState: CanvasState.initial(),
+    connectionState: NetworkConnectionState.disconnected,
+    networkStatistics: const NetworkStatistics(),
+    connectionQuality: ConnectionQuality.disconnected,
+    synchronizationState: SynchronizationState.outOfSync,
+    sessionState: LANSessionLifecycleState.discovering,
+    diagnostics: SynchronizationDiagnostics.initial(),
+  );
 
   final Room? room;
   final List<PlayerConnection> players;

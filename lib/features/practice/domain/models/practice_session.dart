@@ -1,7 +1,8 @@
 import 'package:stroke_wars/features/canvas/domain/models/canvas_state.dart';
 import 'package:stroke_wars/features/canvas/domain/models/stroke.dart';
 import 'package:stroke_wars/features/canvas/domain/models/brush_settings.dart';
-import 'package:stroke_wars/features/canvas/domain/models/brush_settings.dart' as bs;
+import 'package:stroke_wars/features/canvas/domain/models/brush_settings.dart'
+    as bs;
 import 'package:flutter/material.dart';
 import 'package:stroke_wars/features/match/domain/models/match.dart';
 import 'package:stroke_wars/features/match/domain/models/round.dart';
@@ -79,36 +80,41 @@ class PracticeSession {
 
   /// Converts this session to a JSON Map.
   Map<String, dynamic> toJson() => {
-        'currentMatch': currentMatch.toJson(),
-        'currentRound': currentRound?.toJson(),
-        'currentWord': currentWord?.toJson(),
-        'canvasState': _canvasStateToJson(canvasState),
-        'timerState': timerState.toJson(),
-        'score': score,
-        'practiceStatistics': practiceStatistics.toJson(),
-        'configuration': configuration.toJson(),
-        'replayMetadata': replayMetadata,
-      };
+    'currentMatch': currentMatch.toJson(),
+    'currentRound': currentRound?.toJson(),
+    'currentWord': currentWord?.toJson(),
+    'canvasState': _canvasStateToJson(canvasState),
+    'timerState': timerState.toJson(),
+    'score': score,
+    'practiceStatistics': practiceStatistics.toJson(),
+    'configuration': configuration.toJson(),
+    'replayMetadata': replayMetadata,
+  };
 
   /// Restores a session from a JSON Map.
-  factory PracticeSession.fromJson(Map<String, dynamic> json) =>
-      PracticeSession(
-        currentMatch: Match.fromJson(json['currentMatch'] as Map<String, dynamic>),
-        currentRound: json['currentRound'] != null
-            ? Round.fromJson(json['currentRound'] as Map<String, dynamic>)
-            : null,
-        currentWord: json['currentWord'] != null
-            ? Word.fromJson(json['currentWord'] as Map<String, dynamic>)
-            : null,
-        canvasState: _canvasStateFromJson(json['canvasState'] as Map<String, dynamic>),
-        timerState: TimerState.fromJson(json['timerState'] as Map<String, dynamic>),
-        score: json['score'] as int? ?? 0,
-        practiceStatistics: PracticeStatistics.fromJson(
-            json['practiceStatistics'] as Map<String, dynamic>),
-        configuration: PracticeConfiguration.fromJson(
-            json['configuration'] as Map<String, dynamic>),
-        replayMetadata: json['replayMetadata'] as String? ?? '',
-      );
+  factory PracticeSession.fromJson(
+    Map<String, dynamic> json,
+  ) => PracticeSession(
+    currentMatch: Match.fromJson(json['currentMatch'] as Map<String, dynamic>),
+    currentRound: json['currentRound'] != null
+        ? Round.fromJson(json['currentRound'] as Map<String, dynamic>)
+        : null,
+    currentWord: json['currentWord'] != null
+        ? Word.fromJson(json['currentWord'] as Map<String, dynamic>)
+        : null,
+    canvasState: _canvasStateFromJson(
+      json['canvasState'] as Map<String, dynamic>,
+    ),
+    timerState: TimerState.fromJson(json['timerState'] as Map<String, dynamic>),
+    score: json['score'] as int? ?? 0,
+    practiceStatistics: PracticeStatistics.fromJson(
+      json['practiceStatistics'] as Map<String, dynamic>,
+    ),
+    configuration: PracticeConfiguration.fromJson(
+      json['configuration'] as Map<String, dynamic>,
+    ),
+    replayMetadata: json['replayMetadata'] as String? ?? '',
+  );
 
   static Map<String, dynamic> _canvasStateToJson(CanvasState state) {
     return {
@@ -120,7 +126,7 @@ class PracticeSession {
         'size': state.selectedBrush.size,
         'opacity': state.selectedBrush.opacity,
         'color': state.selectedBrush.color.value,
-      }
+      },
     };
   }
 
@@ -128,7 +134,9 @@ class PracticeSession {
     final brushJson = json['selectedBrush'] as Map<String, dynamic>?;
     final selectedBrush = brushJson != null
         ? BrushSettings(
-            type: bs.BrushType.values.firstWhere((e) => e.name == brushJson['type']),
+            type: bs.BrushType.values.firstWhere(
+              (e) => e.name == brushJson['type'],
+            ),
             size: (brushJson['size'] as num).toDouble(),
             opacity: (brushJson['opacity'] as num).toDouble(),
             color: Color(brushJson['color'] as int),

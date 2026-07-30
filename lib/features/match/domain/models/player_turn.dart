@@ -23,13 +23,13 @@ class PlayerTurn {
     drawerId: json['drawerId'] as String,
     drawerDisplayName: json['drawerDisplayName'] as String,
     startedAt: DateTime.parse(json['startedAt'] as String),
-    endedAt:
-        json['endedAt'] != null
-            ? DateTime.parse(json['endedAt'] as String)
-            : null,
+    endedAt: json['endedAt'] != null
+        ? DateTime.parse(json['endedAt'] as String)
+        : null,
     completed: json['completed'] as bool? ?? false,
     skipped: json['skipped'] as bool? ?? false,
-    wordsOffered: (json['wordsOffered'] as List<dynamic>?)?.cast<String>() ?? const [],
+    wordsOffered:
+        (json['wordsOffered'] as List<dynamic>?)?.cast<String>() ?? const [],
     wordChosenId: json['wordChosenId'] as String?,
   );
 

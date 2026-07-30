@@ -86,8 +86,9 @@ void main() {
         final slots = [_slot('A'), _slot('B'), _slot('C')];
         final manager = _manager(slots);
         // Disconnect B
-        final updated =
-            slots.map((s) => s.slotId == 'B' ? s.copyWith(isConnected: false) : s).toList();
+        final updated = slots
+            .map((s) => s.slotId == 'B' ? s.copyWith(isConnected: false) : s)
+            .toList();
         manager.updatePlayers(updated);
         manager.advance(); // from A, should skip B → C
         final drawer = manager.currentDrawer;
@@ -138,13 +139,28 @@ void main() {
       test('turnsForRound returns only matching round turns', () {
         final manager = _manager([_slot('A'), _slot('B')]);
         manager.recordTurn(
-          PlayerTurn(roundNumber: 1, drawerId: 'player_A', drawerDisplayName: 'A', startedAt: DateTime(2026)),
+          PlayerTurn(
+            roundNumber: 1,
+            drawerId: 'player_A',
+            drawerDisplayName: 'A',
+            startedAt: DateTime(2026),
+          ),
         );
         manager.recordTurn(
-          PlayerTurn(roundNumber: 2, drawerId: 'player_B', drawerDisplayName: 'B', startedAt: DateTime(2026)),
+          PlayerTurn(
+            roundNumber: 2,
+            drawerId: 'player_B',
+            drawerDisplayName: 'B',
+            startedAt: DateTime(2026),
+          ),
         );
         manager.recordTurn(
-          PlayerTurn(roundNumber: 1, drawerId: 'player_B', drawerDisplayName: 'B', startedAt: DateTime(2026)),
+          PlayerTurn(
+            roundNumber: 1,
+            drawerId: 'player_B',
+            drawerDisplayName: 'B',
+            startedAt: DateTime(2026),
+          ),
         );
 
         expect(manager.turnsForRound(1).length, 2);
@@ -154,13 +170,28 @@ void main() {
       test('drawCountFor returns times a player has drawn', () {
         final manager = _manager([_slot('A'), _slot('B')]);
         manager.recordTurn(
-          PlayerTurn(roundNumber: 1, drawerId: 'player_A', drawerDisplayName: 'A', startedAt: DateTime(2026)),
+          PlayerTurn(
+            roundNumber: 1,
+            drawerId: 'player_A',
+            drawerDisplayName: 'A',
+            startedAt: DateTime(2026),
+          ),
         );
         manager.recordTurn(
-          PlayerTurn(roundNumber: 3, drawerId: 'player_A', drawerDisplayName: 'A', startedAt: DateTime(2026)),
+          PlayerTurn(
+            roundNumber: 3,
+            drawerId: 'player_A',
+            drawerDisplayName: 'A',
+            startedAt: DateTime(2026),
+          ),
         );
         manager.recordTurn(
-          PlayerTurn(roundNumber: 2, drawerId: 'player_B', drawerDisplayName: 'B', startedAt: DateTime(2026)),
+          PlayerTurn(
+            roundNumber: 2,
+            drawerId: 'player_B',
+            drawerDisplayName: 'B',
+            startedAt: DateTime(2026),
+          ),
         );
         expect(manager.drawCountFor('player_A'), 2);
         expect(manager.drawCountFor('player_B'), 1);
@@ -172,7 +203,12 @@ void main() {
         final manager = _manager([_slot('A'), _slot('B')]);
         manager.advance();
         manager.recordTurn(
-          PlayerTurn(roundNumber: 1, drawerId: 'player_A', drawerDisplayName: 'A', startedAt: DateTime(2026)),
+          PlayerTurn(
+            roundNumber: 1,
+            drawerId: 'player_A',
+            drawerDisplayName: 'A',
+            startedAt: DateTime(2026),
+          ),
         );
 
         manager.reset([_slot('X'), _slot('Y')]);
@@ -183,19 +219,22 @@ void main() {
     });
 
     group('6-player rotation', () {
-      test('full round-robin visits every player exactly once in 6 advances', () {
-        final slots = List.generate(6, (i) => _slot('P$i'));
-        final manager = _manager(slots);
+      test(
+        'full round-robin visits every player exactly once in 6 advances',
+        () {
+          final slots = List.generate(6, (i) => _slot('P$i'));
+          final manager = _manager(slots);
 
-        final visited = <String>{};
-        for (var i = 0; i < 6; i++) {
-          final next = manager.advance();
-          expect(next, isNotNull);
-          visited.add(next!.slotId);
-        }
-        // After 6 advances from index 0, every slot should have been visited
-        expect(visited.length, 6);
-      });
+          final visited = <String>{};
+          for (var i = 0; i < 6; i++) {
+            final next = manager.advance();
+            expect(next, isNotNull);
+            visited.add(next!.slotId);
+          }
+          // After 6 advances from index 0, every slot should have been visited
+          expect(visited.length, 6);
+        },
+      );
     });
   });
 }

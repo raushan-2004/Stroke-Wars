@@ -45,11 +45,13 @@ class PracticeBotEngine {
       final targetCorrectTime = _correctGuessTimes[botId] ?? 999;
       if (elapsedSecs >= targetCorrectTime) {
         _guessedCorrectly.add(botId);
-        commands.add(SubmitGuessCommand(
-          matchId: matchId,
-          playerId: botId,
-          guessText: targetWord,
-        ));
+        commands.add(
+          SubmitGuessCommand(
+            matchId: matchId,
+            playerId: botId,
+            guessText: targetWord,
+          ),
+        );
         continue;
       }
 
@@ -64,11 +66,13 @@ class PracticeBotEngine {
 
         // Ensure we don't accidentally guess the correct word as an incorrect guess
         if (guessWord.trim().toLowerCase() != targetWord.trim().toLowerCase()) {
-          commands.add(SubmitGuessCommand(
-            matchId: matchId,
-            playerId: botId,
-            guessText: guessWord,
-          ));
+          commands.add(
+            SubmitGuessCommand(
+              matchId: matchId,
+              playerId: botId,
+              guessText: guessWord,
+            ),
+          );
         }
       }
     }

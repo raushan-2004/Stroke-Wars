@@ -39,10 +39,9 @@ class Round {
     configuration: RoundConfiguration.fromJson(
       json['configuration'] as Map<String, dynamic>,
     ),
-    word:
-        json['word'] != null
-            ? Word.fromJson(json['word'] as Map<String, dynamic>)
-            : null,
+    word: json['word'] != null
+        ? Word.fromJson(json['word'] as Map<String, dynamic>)
+        : null,
     wordOptions:
         (json['wordOptions'] as List<dynamic>?)
             ?.map((w) => Word.fromJson(w as Map<String, dynamic>))
@@ -58,22 +57,18 @@ class Round {
             ?.map((s) => Score.fromJson(s as Map<String, dynamic>))
             .toList() ??
         const [],
-    playerTurn:
-        json['playerTurn'] != null
-            ? PlayerTurn.fromJson(json['playerTurn'] as Map<String, dynamic>)
-            : null,
-    timerState:
-        json['timerState'] != null
-            ? TimerState.fromJson(json['timerState'] as Map<String, dynamic>)
-            : null,
-    startedAt:
-        json['startedAt'] != null
-            ? DateTime.parse(json['startedAt'] as String)
-            : null,
-    finishedAt:
-        json['finishedAt'] != null
-            ? DateTime.parse(json['finishedAt'] as String)
-            : null,
+    playerTurn: json['playerTurn'] != null
+        ? PlayerTurn.fromJson(json['playerTurn'] as Map<String, dynamic>)
+        : null,
+    timerState: json['timerState'] != null
+        ? TimerState.fromJson(json['timerState'] as Map<String, dynamic>)
+        : null,
+    startedAt: json['startedAt'] != null
+        ? DateTime.parse(json['startedAt'] as String)
+        : null,
+    finishedAt: json['finishedAt'] != null
+        ? DateTime.parse(json['finishedAt'] as String)
+        : null,
   );
 
   static RoundState _stateFromJson(String name) => switch (name) {

@@ -6,7 +6,9 @@ class MessageId {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is MessageId && runtimeType == other.runtimeType && value == other.value;
+      other is MessageId &&
+          runtimeType == other.runtimeType &&
+          value == other.value;
 
   @override
   int get hashCode => value.hashCode;
@@ -23,7 +25,9 @@ class SessionId {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is SessionId && runtimeType == other.runtimeType && value == other.value;
+      other is SessionId &&
+          runtimeType == other.runtimeType &&
+          value == other.value;
 
   @override
   int get hashCode => value.hashCode;
@@ -40,7 +44,9 @@ class ConnectionId {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is ConnectionId && runtimeType == other.runtimeType && value == other.value;
+      other is ConnectionId &&
+          runtimeType == other.runtimeType &&
+          value == other.value;
 
   @override
   int get hashCode => value.hashCode;
@@ -57,7 +63,9 @@ class RoomId {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is RoomId && runtimeType == other.runtimeType && value == other.value;
+      other is RoomId &&
+          runtimeType == other.runtimeType &&
+          value == other.value;
 
   @override
   int get hashCode => value.hashCode;
@@ -74,7 +82,9 @@ class PeerId {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is PeerId && runtimeType == other.runtimeType && value == other.value;
+      other is PeerId &&
+          runtimeType == other.runtimeType &&
+          value == other.value;
 
   @override
   int get hashCode => value.hashCode;

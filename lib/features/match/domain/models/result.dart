@@ -23,12 +23,16 @@ sealed class Result<T> {
   /// Returns the successful value or throws if a failure.
   T get valueOrThrow => switch (this) {
     Success<T>(:final value) => value,
-    Failure<T>() => throw StateError('Cannot retrieve value from a Failure result.'),
+    Failure<T>() => throw StateError(
+      'Cannot retrieve value from a Failure result.',
+    ),
   };
 
   /// Returns the failure error or throws if a success.
   MatchFailure get errorOrThrow => switch (this) {
-    Success<T>() => throw StateError('Cannot retrieve error from a Success result.'),
+    Success<T>() => throw StateError(
+      'Cannot retrieve error from a Success result.',
+    ),
     Failure<T>(:final error) => error,
   };
 }

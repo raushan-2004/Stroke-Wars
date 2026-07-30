@@ -92,8 +92,7 @@ class MatchStatistics {
     currentStreak: currentStreak ?? this.currentStreak,
     totalPointsEarned: totalPointsEarned ?? this.totalPointsEarned,
     wordsDrawn: wordsDrawn ?? this.wordsDrawn,
-    wordsGuessedCorrectly:
-        wordsGuessedCorrectly ?? this.wordsGuessedCorrectly,
+    wordsGuessedCorrectly: wordsGuessedCorrectly ?? this.wordsGuessedCorrectly,
   );
 
   /// Converts this [MatchStatistics] to a JSON-serializable map.

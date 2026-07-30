@@ -103,7 +103,10 @@ class MatchController {
   set match(Match? value) {
     _match = value;
     if (value != null) {
-      _turnManager = TurnManager(players: value.players, rules: rules.turnRules);
+      _turnManager = TurnManager(
+        players: value.players,
+        rules: rules.turnRules,
+      );
       for (final turn in value.turnHistory) {
         _turnManager!.recordTurn(turn);
       }
@@ -119,8 +122,7 @@ class MatchController {
       _match != null ? MatchSnapshot.from(_match!) : null;
 
   /// True if a match is currently loaded and active.
-  bool get hasActiveMatch =>
-      _match != null && !_match!.state.isTerminal;
+  bool get hasActiveMatch => _match != null && !_match!.state.isTerminal;
 
   // ───────────────────────────────────────────────────────────────────────────
   // State Mutation (Transition Application)
@@ -131,13 +133,20 @@ class MatchController {
   void applyTransition(StateTransition transition, Match mutatedMatch) {
     // 1. Update sequence generator to the latest assigned sequence number
     if (transition.generatedEvents.isNotEmpty) {
-      sequenceGenerator.current = transition.generatedEvents.last.sequenceNumber;
+      sequenceGenerator.current =
+          transition.generatedEvents.last.sequenceNumber;
     }
 
     // 2. Tally final turn / score additions in command histories
-    final appendedCommands = [...mutatedMatch.commandHistory, transition.triggerCommand];
+    final appendedCommands = [
+      ...mutatedMatch.commandHistory,
+      transition.triggerCommand,
+    ];
     final appendedTransitions = [...mutatedMatch.transitionHistory, transition];
-    final appendedEvents = [...mutatedMatch.eventHistory, ...transition.generatedEvents];
+    final appendedEvents = [
+      ...mutatedMatch.eventHistory,
+      ...transition.generatedEvents,
+    ];
 
     // 3. Save mutated state with added histories
     _match = mutatedMatch.copyWith(
@@ -149,13 +158,19 @@ class MatchController {
 
     // 4. Update TurnManager list and history
     if (_turnManager == null) {
-      _turnManager = TurnManager(players: _match!.players, rules: rules.turnRules);
+      _turnManager = TurnManager(
+        players: _match!.players,
+        rules: rules.turnRules,
+      );
     } else {
       _turnManager!.updatePlayers(_match!.players);
     }
     _turnManager!.currentIndex = _match!.currentRoundIndex;
-    for (final turn in transition.generatedEvents.whereType<RoundEndedEvent>()) {
-      final round = _match!.rounds.firstWhere((r) => r.roundNumber == turn.roundNumber);
+    for (final turn
+        in transition.generatedEvents.whereType<RoundEndedEvent>()) {
+      final round = _match!.rounds.firstWhere(
+        (r) => r.roundNumber == turn.roundNumber,
+      );
       if (round.playerTurn != null) {
         _turnManager!.recordTurn(round.playerTurn!);
       }
@@ -203,11 +218,13 @@ class MatchController {
         hostId: cmd.hostId,
       );
 
-      return Success(DryRunOutcome(
-        toState: const MatchWaitingState(),
-        events: [event],
-        mutatedMatch: newMatch,
-      ));
+      return Success(
+        DryRunOutcome(
+          toState: const MatchWaitingState(),
+          events: [event],
+          mutatedMatch: newMatch,
+        ),
+      );
     }
 
     if (cmd is JoinMatchCommand) {
@@ -219,9 +236,7 @@ class MatchController {
         avatarId: cmd.avatarId,
       );
 
-      final updatedMatch = match.copyWith(
-        players: [...match.players, slot],
-      );
+      final updatedMatch = match.copyWith(players: [...match.players, slot]);
 
       final event = PlayerJoinedEvent(
         matchId: match.id,
@@ -232,18 +247,18 @@ class MatchController {
         displayName: cmd.displayName,
       );
 
-      return Success(DryRunOutcome(
-        toState: const MatchWaitingState(),
-        events: [event],
-        mutatedMatch: updatedMatch,
-      ));
+      return Success(
+        DryRunOutcome(
+          toState: const MatchWaitingState(),
+          events: [event],
+          mutatedMatch: updatedMatch,
+        ),
+      );
     }
 
     if (cmd is LeaveMatchCommand) {
       final updated = match.players.map((p) {
-        return p.playerId == cmd.playerId
-            ? p.copyWith(isConnected: false)
-            : p;
+        return p.playerId == cmd.playerId ? p.copyWith(isConnected: false) : p;
       }).toList();
 
       final updatedMatch = match.copyWith(players: updated);
@@ -255,11 +270,13 @@ class MatchController {
         playerId: cmd.playerId,
       );
 
-      return Success(DryRunOutcome(
-        toState: match.state,
-        events: [event],
-        mutatedMatch: updatedMatch,
-      ));
+      return Success(
+        DryRunOutcome(
+          toState: match.state,
+          events: [event],
+          mutatedMatch: updatedMatch,
+        ),
+      );
     }
 
     if (cmd is ReadyPlayerCommand) {
@@ -279,11 +296,13 @@ class MatchController {
         isReady: cmd.isReady,
       );
 
-      return Success(DryRunOutcome(
-        toState: const MatchWaitingState(),
-        events: [event],
-        mutatedMatch: updatedMatch,
-      ));
+      return Success(
+        DryRunOutcome(
+          toState: const MatchWaitingState(),
+          events: [event],
+          mutatedMatch: updatedMatch,
+        ),
+      );
     }
 
     if (cmd is StartMatchCommand) {
@@ -295,15 +314,20 @@ class MatchController {
         originPlayer: cmd.hostId,
       );
 
-      return Success(DryRunOutcome(
-        toState: const MatchStartingState(),
-        events: [event],
-        mutatedMatch: updatedMatch,
-      ));
+      return Success(
+        DryRunOutcome(
+          toState: const MatchStartingState(),
+          events: [event],
+          mutatedMatch: updatedMatch,
+        ),
+      );
     }
 
     if (cmd is StartRoundCommand) {
-      final tempTurnManager = TurnManager(players: match.players, rules: rules.turnRules);
+      final tempTurnManager = TurnManager(
+        players: match.players,
+        rules: rules.turnRules,
+      );
       for (final turn in match.turnHistory) {
         tempTurnManager.recordTurn(turn);
       }
@@ -311,11 +335,15 @@ class MatchController {
 
       final drawer = tempTurnManager.advance();
       if (drawer == null) {
-        return const Failure(PlayerNotFoundFailure('No eligible drawer found.'));
+        return const Failure(
+          PlayerNotFoundFailure('No eligible drawer found.'),
+        );
       }
 
       final roundNumber = match.rounds.length + 1;
-      final wordOptions = await wordSelector.selectWordsForRound(match.configuration);
+      final wordOptions = await wordSelector.selectWordsForRound(
+        match.configuration,
+      );
 
       final round = Round(
         id: RoundId.generate(),
@@ -352,11 +380,13 @@ class MatchController {
         drawerId: drawer.playerId,
       );
 
-      return Success(DryRunOutcome(
-        toState: const WordSelectionState(),
-        events: [event],
-        mutatedMatch: updatedMatch,
-      ));
+      return Success(
+        DryRunOutcome(
+          toState: const WordSelectionState(),
+          events: [event],
+          mutatedMatch: updatedMatch,
+        ),
+      );
     }
 
     if (cmd is ChooseWordCommand) {
@@ -397,11 +427,13 @@ class MatchController {
         wordId: cmd.wordId,
       );
 
-      return Success(DryRunOutcome(
-        toState: const DrawingState(),
-        events: [event],
-        mutatedMatch: updatedMatch,
-      ));
+      return Success(
+        DryRunOutcome(
+          toState: const DrawingState(),
+          events: [event],
+          mutatedMatch: updatedMatch,
+        ),
+      );
     }
 
     if (cmd is SubmitGuessCommand) {
@@ -410,7 +442,10 @@ class MatchController {
         return const Failure(InvalidTransitionFailure('No active round.'));
       }
 
-      final isCorrect = rules.wordRules.isCorrectGuess(cmd.guessText, round.word!.text);
+      final isCorrect = rules.wordRules.isCorrectGuess(
+        cmd.guessText,
+        round.word!.text,
+      );
       final result = isCorrect ? GuessResult.correct : GuessResult.incorrect;
       final guessTimeMs = round.startedAt != null
           ? clock.now.difference(round.startedAt!).inMilliseconds
@@ -429,7 +464,9 @@ class MatchController {
       var pointsAwarded = 0;
 
       if (isCorrect) {
-        final isFirst = !round.guesses.any((g) => g.result == GuessResult.correct);
+        final isFirst = !round.guesses.any(
+          (g) => g.result == GuessResult.correct,
+        );
         final scoreResult = scoring.scoreCorrectGuess(
           playerId: cmd.playerId,
           roundId: round.id,
@@ -445,27 +482,31 @@ class MatchController {
       }
 
       final generatedEvents = <MatchEvent>[];
-      generatedEvents.add(GuessSubmittedEvent(
-        matchId: match.id,
-        timestamp: clock.now,
-        sequenceNumber: seq++,
-        roundId: round.id.value,
-        originPlayer: cmd.playerId,
-        playerId: cmd.playerId,
-        guessText: cmd.guessText,
-      ));
-
-      if (isCorrect) {
-        generatedEvents.add(CorrectGuessEvent(
+      generatedEvents.add(
+        GuessSubmittedEvent(
           matchId: match.id,
           timestamp: clock.now,
           sequenceNumber: seq++,
           roundId: round.id.value,
           originPlayer: cmd.playerId,
           playerId: cmd.playerId,
-          guessTimeMs: guessTimeMs,
-          pointsAwarded: pointsAwarded,
-        ));
+          guessText: cmd.guessText,
+        ),
+      );
+
+      if (isCorrect) {
+        generatedEvents.add(
+          CorrectGuessEvent(
+            matchId: match.id,
+            timestamp: clock.now,
+            sequenceNumber: seq++,
+            roundId: round.id.value,
+            originPlayer: cmd.playerId,
+            playerId: cmd.playerId,
+            guessTimeMs: guessTimeMs,
+            pointsAwarded: pointsAwarded,
+          ),
+        );
       }
 
       var updatedRound = round.copyWith(
@@ -477,11 +518,13 @@ class MatchController {
         rounds: _replaceCurrentRound(match, updatedRound),
         scoreHistory: newScoreHistory,
       );
-      return Success(DryRunOutcome(
-        toState: const GuessingState(),
-        events: generatedEvents,
-        mutatedMatch: updatedMatch,
-      ));
+      return Success(
+        DryRunOutcome(
+          toState: const GuessingState(),
+          events: generatedEvents,
+          mutatedMatch: updatedMatch,
+        ),
+      );
     }
 
     if (cmd is SkipTurnCommand) {
@@ -503,7 +546,9 @@ class MatchController {
 
       final updatedMatch = match.copyWith(
         rounds: _replaceCurrentRound(match, updatedRound),
-        turnHistory: turn != null ? [...match.turnHistory, turn] : match.turnHistory,
+        turnHistory: turn != null
+            ? [...match.turnHistory, turn]
+            : match.turnHistory,
       );
 
       final event1 = PlayerSkippedEvent(
@@ -523,11 +568,13 @@ class MatchController {
         roundNumber: round.roundNumber,
       );
 
-      return Success(DryRunOutcome(
-        toState: const RoundFinishedState(),
-        events: [event1, event2],
-        mutatedMatch: updatedMatch,
-      ));
+      return Success(
+        DryRunOutcome(
+          toState: const RoundFinishedState(),
+          events: [event1, event2],
+          mutatedMatch: updatedMatch,
+        ),
+      );
     }
 
     if (cmd is EndRoundCommand) {
@@ -536,7 +583,9 @@ class MatchController {
         return const Failure(InvalidTransitionFailure('No active round.'));
       }
 
-      final correctGuesses = round.guesses.where((g) => g.result.awardsPoints).toList();
+      final correctGuesses = round.guesses
+          .where((g) => g.result.awardsPoints)
+          .toList();
       final drawerScore = scoring.scoreDrawer(
         drawerId: round.drawerSlotId,
         roundId: round.id,
@@ -575,7 +624,9 @@ class MatchController {
         rounds: _replaceCurrentRound(match, updatedRound),
         players: updatedPlayers,
         scoreHistory: newScoreHistory,
-        turnHistory: turn != null ? [...match.turnHistory, turn] : match.turnHistory,
+        turnHistory: turn != null
+            ? [...match.turnHistory, turn]
+            : match.turnHistory,
       );
 
       final event1 = RoundEndedEvent(
@@ -588,21 +639,25 @@ class MatchController {
 
       final events = <MatchEvent>[event1];
       if (round.word != null) {
-        events.add(WordRevealedEvent(
-          matchId: match.id,
-          timestamp: clock.now,
-          sequenceNumber: seq++,
-          roundId: round.id.value,
-          roundNumber: round.roundNumber,
-          wordText: round.word!.text,
-        ));
+        events.add(
+          WordRevealedEvent(
+            matchId: match.id,
+            timestamp: clock.now,
+            sequenceNumber: seq++,
+            roundId: round.id.value,
+            roundNumber: round.roundNumber,
+            wordText: round.word!.text,
+          ),
+        );
       }
 
-      return Success(DryRunOutcome(
-        toState: const RoundFinishedState(),
-        events: events,
-        mutatedMatch: updatedMatch,
-      ));
+      return Success(
+        DryRunOutcome(
+          toState: const RoundFinishedState(),
+          events: events,
+          mutatedMatch: updatedMatch,
+        ),
+      );
     }
 
     if (cmd is FinishMatchCommand) {
@@ -631,11 +686,13 @@ class MatchController {
         winnerId: winnerId ?? '',
       );
 
-      return Success(DryRunOutcome(
-        toState: const MatchFinishedState(),
-        events: [event],
-        mutatedMatch: updatedMatch,
-      ));
+      return Success(
+        DryRunOutcome(
+          toState: const MatchFinishedState(),
+          events: [event],
+          mutatedMatch: updatedMatch,
+        ),
+      );
     }
 
     if (cmd is CancelMatchCommand) {
@@ -646,11 +703,13 @@ class MatchController {
         reason: cmd.reason,
       );
 
-      return Success(DryRunOutcome(
-        toState: const MatchCancelledState(),
-        events: [event],
-        mutatedMatch: match,
-      ));
+      return Success(
+        DryRunOutcome(
+          toState: const MatchCancelledState(),
+          events: [event],
+          mutatedMatch: match,
+        ),
+      );
     }
 
     return const Failure(UnexpectedCommandFailure('Unknown', 'Unknown'));

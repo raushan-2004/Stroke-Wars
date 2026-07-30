@@ -119,7 +119,9 @@ void main() {
         );
 
         await tester.pumpWidget(
-          buildTestApp(Scaffold(body: SWDashboardCard(module: bluetoothModule))),
+          buildTestApp(
+            Scaffold(body: SWDashboardCard(module: bluetoothModule)),
+          ),
         );
 
         await tester.pumpAndSettle();

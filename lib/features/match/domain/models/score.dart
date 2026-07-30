@@ -70,9 +70,7 @@ class Score {
 
   @override
   bool operator ==(Object other) =>
-      other is Score &&
-      other.playerId == playerId &&
-      other.roundId == roundId;
+      other is Score && other.playerId == playerId && other.roundId == roundId;
 
   @override
   int get hashCode => Object.hash(playerId, roundId);

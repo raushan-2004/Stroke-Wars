@@ -93,10 +93,9 @@ void main() {
         allowedCategories: const [WordCategory.animals],
       );
 
-      final result = await processor.process(CreateMatchCommand(
-        hostId: 'host-1',
-        configuration: config,
-      ));
+      final result = await processor.process(
+        CreateMatchCommand(hostId: 'host-1', configuration: config),
+      );
 
       expect(result.isSuccess, true);
       final outcome = result.valueOrThrow;
@@ -117,39 +116,71 @@ void main() {
         allowedCategories: const [WordCategory.animals],
       );
 
-      await processor.process(CreateMatchCommand(hostId: 'host-1', configuration: config));
-      await processor.process(JoinMatchCommand(matchId: controller.match!.id, playerId: 'player-2', displayName: 'Bob'));
-      await processor.process(ReadyPlayerCommand(matchId: controller.match!.id, playerId: 'host-1', isReady: true));
-      await processor.process(ReadyPlayerCommand(matchId: controller.match!.id, playerId: 'player-2', isReady: true));
-      await processor.process(StartMatchCommand(matchId: controller.match!.id, hostId: 'host-1'));
+      await processor.process(
+        CreateMatchCommand(hostId: 'host-1', configuration: config),
+      );
+      await processor.process(
+        JoinMatchCommand(
+          matchId: controller.match!.id,
+          playerId: 'player-2',
+          displayName: 'Bob',
+        ),
+      );
+      await processor.process(
+        ReadyPlayerCommand(
+          matchId: controller.match!.id,
+          playerId: 'host-1',
+          isReady: true,
+        ),
+      );
+      await processor.process(
+        ReadyPlayerCommand(
+          matchId: controller.match!.id,
+          playerId: 'player-2',
+          isReady: true,
+        ),
+      );
+      await processor.process(
+        StartMatchCommand(matchId: controller.match!.id, hostId: 'host-1'),
+      );
 
       // Draw round
       await processor.process(StartRoundCommand(matchId: controller.match!.id));
       final round = controller.match!.currentRound!;
       final wordChoice = round.wordOptions.first;
-      final drawerId = controller.match!.players.firstWhere((p) => p.role == PlayerRole.drawer).playerId;
-      final guesserId = controller.match!.players.firstWhere((p) => p.playerId != drawerId).playerId;
+      final drawerId = controller.match!.players
+          .firstWhere((p) => p.role == PlayerRole.drawer)
+          .playerId;
+      final guesserId = controller.match!.players
+          .firstWhere((p) => p.playerId != drawerId)
+          .playerId;
 
-      await processor.process(ChooseWordCommand(
-        matchId: controller.match!.id,
-        drawerId: drawerId,
-        wordId: wordChoice.id,
-      ));
+      await processor.process(
+        ChooseWordCommand(
+          matchId: controller.match!.id,
+          drawerId: drawerId,
+          wordId: wordChoice.id,
+        ),
+      );
 
       // First guess
-      final guessResult = await processor.process(SubmitGuessCommand(
-        matchId: controller.match!.id,
-        playerId: guesserId,
-        guessText: 'wrongguess',
-      ));
+      final guessResult = await processor.process(
+        SubmitGuessCommand(
+          matchId: controller.match!.id,
+          playerId: guesserId,
+          guessText: 'wrongguess',
+        ),
+      );
       expect(guessResult.isSuccess, true);
 
       // Duplicate guess (same player + text)
-      final duplicateResult = await processor.process(SubmitGuessCommand(
-        matchId: controller.match!.id,
-        playerId: guesserId,
-        guessText: 'wrongguess',
-      ));
+      final duplicateResult = await processor.process(
+        SubmitGuessCommand(
+          matchId: controller.match!.id,
+          playerId: guesserId,
+          guessText: 'wrongguess',
+        ),
+      );
       expect(duplicateResult.isFailure, true);
       expect(duplicateResult.errorOrThrow, isA<DuplicateCommandFailure>());
     });
@@ -161,61 +192,102 @@ void main() {
         allowedCategories: const [WordCategory.animals],
       );
 
-      await processor.process(CreateMatchCommand(hostId: 'host-1', configuration: config));
-      await processor.process(JoinMatchCommand(matchId: controller.match!.id, playerId: 'player-2', displayName: 'Bob'));
+      await processor.process(
+        CreateMatchCommand(hostId: 'host-1', configuration: config),
+      );
+      await processor.process(
+        JoinMatchCommand(
+          matchId: controller.match!.id,
+          playerId: 'player-2',
+          displayName: 'Bob',
+        ),
+      );
 
       // Ready host
-      final readyRes1 = await processor.process(ReadyPlayerCommand(
-        matchId: controller.match!.id,
-        playerId: 'host-1',
-        isReady: true,
-      ));
+      final readyRes1 = await processor.process(
+        ReadyPlayerCommand(
+          matchId: controller.match!.id,
+          playerId: 'host-1',
+          isReady: true,
+        ),
+      );
       expect(readyRes1.isSuccess, true);
       expect(controller.match!.playerByPlayerId('host-1')!.isReady, true);
 
       // Repeat readiness (should fail)
-      final duplicateReady = await processor.process(ReadyPlayerCommand(
-        matchId: controller.match!.id,
-        playerId: 'host-1',
-        isReady: true,
-      ));
+      final duplicateReady = await processor.process(
+        ReadyPlayerCommand(
+          matchId: controller.match!.id,
+          playerId: 'host-1',
+          isReady: true,
+        ),
+      );
       expect(duplicateReady.isFailure, true);
       expect(duplicateReady.errorOrThrow, isA<PlayerAlreadyReadyFailure>());
     });
 
-    test('5. Lifecycle Progression and Validation Rejecting Invalid Transitions', () async {
-      final config = MatchConfiguration(
-        minPlayers: 2,
-        maxPlayers: 4,
-        allowedCategories: const [WordCategory.animals],
-      );
+    test(
+      '5. Lifecycle Progression and Validation Rejecting Invalid Transitions',
+      () async {
+        final config = MatchConfiguration(
+          minPlayers: 2,
+          maxPlayers: 4,
+          allowedCategories: const [WordCategory.animals],
+        );
 
-      await processor.process(CreateMatchCommand(hostId: 'host-1', configuration: config));
+        await processor.process(
+          CreateMatchCommand(hostId: 'host-1', configuration: config),
+        );
 
-      // Attempt start when players not ready (should fail validation)
-      final startFail = await processor.process(StartMatchCommand(matchId: controller.match!.id, hostId: 'host-1'));
-      expect(startFail.isFailure, true);
-      expect(startFail.errorOrThrow, isA<MatchNotReadyFailure>());
+        // Attempt start when players not ready (should fail validation)
+        final startFail = await processor.process(
+          StartMatchCommand(matchId: controller.match!.id, hostId: 'host-1'),
+        );
+        expect(startFail.isFailure, true);
+        expect(startFail.errorOrThrow, isA<MatchNotReadyFailure>());
 
-      // Join second player and ready all
-      await processor.process(JoinMatchCommand(matchId: controller.match!.id, playerId: 'player-2', displayName: 'Bob'));
-      await processor.process(ReadyPlayerCommand(matchId: controller.match!.id, playerId: 'host-1', isReady: true));
-      await processor.process(ReadyPlayerCommand(matchId: controller.match!.id, playerId: 'player-2', isReady: true));
+        // Join second player and ready all
+        await processor.process(
+          JoinMatchCommand(
+            matchId: controller.match!.id,
+            playerId: 'player-2',
+            displayName: 'Bob',
+          ),
+        );
+        await processor.process(
+          ReadyPlayerCommand(
+            matchId: controller.match!.id,
+            playerId: 'host-1',
+            isReady: true,
+          ),
+        );
+        await processor.process(
+          ReadyPlayerCommand(
+            matchId: controller.match!.id,
+            playerId: 'player-2',
+            isReady: true,
+          ),
+        );
 
-      // Start match successfully
-      final startSuccess = await processor.process(StartMatchCommand(matchId: controller.match!.id, hostId: 'host-1'));
-      expect(startSuccess.isSuccess, true);
-      expect(controller.match!.state, isA<MatchStartingState>());
+        // Start match successfully
+        final startSuccess = await processor.process(
+          StartMatchCommand(matchId: controller.match!.id, hostId: 'host-1'),
+        );
+        expect(startSuccess.isSuccess, true);
+        expect(controller.match!.state, isA<MatchStartingState>());
 
-      // Try choosing a word in starting state (invalid transition, round not started)
-      final chooseFail = await processor.process(ChooseWordCommand(
-        matchId: controller.match!.id,
-        drawerId: 'host-1',
-        wordId: 'word-id',
-      ));
-      expect(chooseFail.isFailure, true);
-      expect(chooseFail.errorOrThrow, isA<UnexpectedCommandFailure>());
-    });
+        // Try choosing a word in starting state (invalid transition, round not started)
+        final chooseFail = await processor.process(
+          ChooseWordCommand(
+            matchId: controller.match!.id,
+            drawerId: 'host-1',
+            wordId: 'word-id',
+          ),
+        );
+        expect(chooseFail.isFailure, true);
+        expect(chooseFail.errorOrThrow, isA<UnexpectedCommandFailure>());
+      },
+    );
 
     test('6. Clock Timers and Stream Clock State Ticks', () async {
       final clockTicks = <MatchClockState>[];
@@ -230,35 +302,68 @@ void main() {
       await subscription.cancel();
     });
 
-    test('7. History Integrity & Event Serialization Replay Verification', () async {
-      final config = MatchConfiguration(
-        minPlayers: 2,
-        maxPlayers: 4,
-        allowedCategories: const [WordCategory.animals],
-      );
+    test(
+      '7. History Integrity & Event Serialization Replay Verification',
+      () async {
+        final config = MatchConfiguration(
+          minPlayers: 2,
+          maxPlayers: 4,
+          allowedCategories: const [WordCategory.animals],
+        );
 
-      await processor.process(CreateMatchCommand(hostId: 'host-1', configuration: config));
-      await processor.process(JoinMatchCommand(matchId: controller.match!.id, playerId: 'player-2', displayName: 'Bob'));
-      await processor.process(ReadyPlayerCommand(matchId: controller.match!.id, playerId: 'host-1', isReady: true));
-      await processor.process(ReadyPlayerCommand(matchId: controller.match!.id, playerId: 'player-2', isReady: true));
-      await processor.process(StartMatchCommand(matchId: controller.match!.id, hostId: 'host-1'));
-      await processor.process(StartRoundCommand(matchId: controller.match!.id));
+        await processor.process(
+          CreateMatchCommand(hostId: 'host-1', configuration: config),
+        );
+        await processor.process(
+          JoinMatchCommand(
+            matchId: controller.match!.id,
+            playerId: 'player-2',
+            displayName: 'Bob',
+          ),
+        );
+        await processor.process(
+          ReadyPlayerCommand(
+            matchId: controller.match!.id,
+            playerId: 'host-1',
+            isReady: true,
+          ),
+        );
+        await processor.process(
+          ReadyPlayerCommand(
+            matchId: controller.match!.id,
+            playerId: 'player-2',
+            isReady: true,
+          ),
+        );
+        await processor.process(
+          StartMatchCommand(matchId: controller.match!.id, hostId: 'host-1'),
+        );
+        await processor.process(
+          StartRoundCommand(matchId: controller.match!.id),
+        );
 
-      final match = controller.match!;
-      expect(match.eventHistory.length, 6); // created, joined, ready, ready, started, roundStarted
+        final match = controller.match!;
+        expect(
+          match.eventHistory.length,
+          6,
+        ); // created, joined, ready, ready, started, roundStarted
 
-      // Verify monotonically increasing sequence numbers
-      for (var i = 0; i < match.eventHistory.length; i++) {
-        expect(match.eventHistory[i].sequenceNumber, i + 1);
-        expect(match.eventHistory[i].eventVersion, 1);
-      }
+        // Verify monotonically increasing sequence numbers
+        for (var i = 0; i < match.eventHistory.length; i++) {
+          expect(match.eventHistory[i].sequenceNumber, i + 1);
+          expect(match.eventHistory[i].eventVersion, 1);
+        }
 
-      // JSON Round-trip verification for Match aggregate and transitions
-      final serialized = match.toJson();
-      final deserialized = Match.fromJson(serialized);
-      expect(deserialized.id, match.id);
-      expect(deserialized.eventHistory.length, match.eventHistory.length);
-      expect(deserialized.transitionHistory.length, match.transitionHistory.length);
-    });
+        // JSON Round-trip verification for Match aggregate and transitions
+        final serialized = match.toJson();
+        final deserialized = Match.fromJson(serialized);
+        expect(deserialized.id, match.id);
+        expect(deserialized.eventHistory.length, match.eventHistory.length);
+        expect(
+          deserialized.transitionHistory.length,
+          match.transitionHistory.length,
+        );
+      },
+    );
   });
 }

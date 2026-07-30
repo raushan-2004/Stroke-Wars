@@ -32,18 +32,19 @@ class DiscoveredRoom {
   final DateTime lastSeen;
 
   Map<String, dynamic> toJson() => {
-        'roomId': roomId.value,
-        'hostName': hostName,
-        'address': address,
-        'port': port,
-        'playerCount': playerCount,
-        'maxPlayers': maxPlayers,
-        'protocolVersion': protocolVersion,
-        'engineVersion': engineVersion,
-        'roomState': roomState,
-      };
+    'roomId': roomId.value,
+    'hostName': hostName,
+    'address': address,
+    'port': port,
+    'playerCount': playerCount,
+    'maxPlayers': maxPlayers,
+    'protocolVersion': protocolVersion,
+    'engineVersion': engineVersion,
+    'roomState': roomState,
+  };
 
-  factory DiscoveredRoom.fromJson(String address, Map<String, dynamic> json) => DiscoveredRoom(
+  factory DiscoveredRoom.fromJson(String address, Map<String, dynamic> json) =>
+      DiscoveredRoom(
         roomId: RoomId(json['roomId'] as String),
         hostName: json['hostName'] as String,
         address: address,
@@ -97,7 +98,10 @@ class PeerDiscoveryService {
     await stopAdvertising();
 
     try {
-      _advertiseSocket = await RawDatagramSocket.bind(InternetAddress.anyIPv4, 0);
+      _advertiseSocket = await RawDatagramSocket.bind(
+        InternetAddress.anyIPv4,
+        0,
+      );
       _advertiseSocket!.broadcastEnabled = true;
 
       _advertiseTimer = Timer.periodic(interval, (_) {
@@ -113,13 +117,23 @@ class PeerDiscoveryService {
             'roomState': roomState,
           };
           final data = utf8.encode(jsonEncode(payload));
-          _advertiseSocket!.send(data, InternetAddress('255.255.255.255'), discoveryPort);
-          _advertiseSocket!.send(data, InternetAddress.loopbackIPv4, discoveryPort);
+          _advertiseSocket!.send(
+            data,
+            InternetAddress('255.255.255.255'),
+            discoveryPort,
+          );
+          _advertiseSocket!.send(
+            data,
+            InternetAddress.loopbackIPv4,
+            discoveryPort,
+          );
         } catch (e) {
           AppLogger.instance.error('Error sending discovery broadcast: $e');
         }
       });
-      AppLogger.instance.info('UDP advertising started on port: $discoveryPort');
+      AppLogger.instance.info(
+        'UDP advertising started on port: $discoveryPort',
+      );
     } catch (e) {
       AppLogger.instance.error('Failed to bind advertising socket: $e');
     }
@@ -139,7 +153,10 @@ class PeerDiscoveryService {
     _discoveredRooms.clear();
 
     try {
-      _browseSocket = await RawDatagramSocket.bind(InternetAddress.anyIPv4, discoveryPort);
+      _browseSocket = await RawDatagramSocket.bind(
+        InternetAddress.anyIPv4,
+        discoveryPort,
+      );
       _browseSocket!.listen(
         (RawSocketEvent event) {
           if (event == RawSocketEvent.read) {
@@ -153,7 +170,8 @@ class PeerDiscoveryService {
                 final roomEngine = json['engineVersion'] as String;
 
                 // Validate protocol version compatibility
-                if (roomProto != protocolVersion || roomEngine != engineVersion) {
+                if (roomProto != protocolVersion ||
+                    roomEngine != engineVersion) {
                   // Incompatible version, ignore gracefully
                   return;
                 }
@@ -178,7 +196,9 @@ class PeerDiscoveryService {
       _pruneTimer = Timer.periodic(const Duration(seconds: 3), (_) {
         final now = DateTime.now();
         final beforeCount = _discoveredRooms.length;
-        _discoveredRooms.removeWhere((_, room) => now.difference(room.lastSeen).inSeconds > 6);
+        _discoveredRooms.removeWhere(
+          (_, room) => now.difference(room.lastSeen).inSeconds > 6,
+        );
         if (_discoveredRooms.length != beforeCount) {
           _roomsController.add(_discoveredRooms.values.toList());
         }

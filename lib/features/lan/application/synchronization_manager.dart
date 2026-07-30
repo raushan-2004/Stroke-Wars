@@ -18,7 +18,11 @@ class SynchronizationManager {
 
   final MatchController matchController;
   final CanvasController canvasController;
-  final void Function(SynchronizationState state, SynchronizationDiagnostics diagnostics) onStateChanged;
+  final void Function(
+    SynchronizationState state,
+    SynchronizationDiagnostics diagnostics,
+  )
+  onStateChanged;
 
   int _lastSequenceReceived = 0;
   int _lastSnapshotVersion = 0;
@@ -67,7 +71,8 @@ class SynchronizationManager {
     _pendingEvents++;
 
     // 1. Sequence validation / Duplicate filtering
-    if (envelope.sequenceNumber <= _lastSequenceReceived && message is! SnapshotMessage) {
+    if (envelope.sequenceNumber <= _lastSequenceReceived &&
+        message is! SnapshotMessage) {
       AppLogger.instance.warning(
         'SynchronizationManager: Dropped duplicate/out-of-order packet (seq=${envelope.sequenceNumber}, expected > $_lastSequenceReceived)',
       );

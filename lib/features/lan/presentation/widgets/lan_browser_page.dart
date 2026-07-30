@@ -36,7 +36,10 @@ class _LANBrowserPageState extends ConsumerState<LANBrowserPage> {
     final name = player?.displayName ?? 'Player Host';
 
     try {
-      await ref.read(lANSessionStateProvider.notifier).controller.hostGame(
+      await ref
+          .read(lANSessionStateProvider.notifier)
+          .controller
+          .hostGame(
             roomName: _roomNameController.text.trim(),
             hostName: name,
             maxPlayers: _maxPlayers,
@@ -56,11 +59,10 @@ class _LANBrowserPageState extends ConsumerState<LANBrowserPage> {
     final name = player?.displayName ?? 'Player Guest';
 
     try {
-      await ref.read(lANSessionStateProvider.notifier).controller.joinGame(
-            address: ip,
-            port: port,
-            playerName: name,
-          );
+      await ref
+          .read(lANSessionStateProvider.notifier)
+          .controller
+          .joinGame(address: ip, port: port, playerName: name);
     } catch (e) {
       if (mounted) {
         SWToast.show(context, 'Joining failed: $e');
@@ -75,7 +77,10 @@ class _LANBrowserPageState extends ConsumerState<LANBrowserPage> {
     final colors = context.swColors;
     final spacing = context.swSpacing;
     final typography = context.swTypography;
-    final browserRooms = ref.watch(lANSessionStateProvider.notifier).controller.discoveredRooms;
+    final browserRooms = ref
+        .watch(lANSessionStateProvider.notifier)
+        .controller
+        .discoveredRooms;
 
     return Center(
       child: SingleChildScrollView(
@@ -113,7 +118,9 @@ class _LANBrowserPageState extends ConsumerState<LANBrowserPage> {
                       labelText: 'Room Name',
                       filled: true,
                       fillColor: colors.surface,
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.r)),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.r),
+                      ),
                     ),
                   ),
                   SizedBox(height: spacing.md),
@@ -124,9 +131,16 @@ class _LANBrowserPageState extends ConsumerState<LANBrowserPage> {
                       DropdownButton<int>(
                         value: _maxPlayers,
                         dropdownColor: colors.surfaceContainer,
-                        style: typography.body.copyWith(color: colors.textPrimary),
+                        style: typography.body.copyWith(
+                          color: colors.textPrimary,
+                        ),
                         items: [2, 3, 4, 6, 8]
-                            .map((v) => DropdownMenuItem(value: v, child: Text('$v Players')))
+                            .map(
+                              (v) => DropdownMenuItem(
+                                value: v,
+                                child: Text('$v Players'),
+                              ),
+                            )
                             .toList(),
                         onChanged: (v) {
                           if (v != null) setState(() => _maxPlayers = v);
@@ -165,7 +179,9 @@ class _LANBrowserPageState extends ConsumerState<LANBrowserPage> {
                               SizedBox(height: spacing.sm),
                               Text(
                                 'Scanning local network...',
-                                style: typography.body.copyWith(color: colors.textMuted),
+                                style: typography.body.copyWith(
+                                  color: colors.textMuted,
+                                ),
                               ),
                             ],
                           ),
@@ -176,7 +192,8 @@ class _LANBrowserPageState extends ConsumerState<LANBrowserPage> {
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
                         itemCount: rooms.length,
-                        separatorBuilder: (_, __) => SizedBox(height: spacing.sm),
+                        separatorBuilder: (_, __) =>
+                            SizedBox(height: spacing.sm),
                         itemBuilder: (context, index) {
                           final room = rooms[index];
                           return Container(
@@ -191,10 +208,17 @@ class _LANBrowserPageState extends ConsumerState<LANBrowserPage> {
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(room.roomId.value, style: typography.body.copyWith(fontWeight: FontWeight.bold)),
+                                    Text(
+                                      room.roomId.value,
+                                      style: typography.body.copyWith(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
                                     Text(
                                       'Host: ${room.hostName} • ${room.playerCount}/${room.maxPlayers}',
-                                      style: typography.caption.copyWith(color: colors.textMuted),
+                                      style: typography.caption.copyWith(
+                                        color: colors.textMuted,
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -202,7 +226,10 @@ class _LANBrowserPageState extends ConsumerState<LANBrowserPage> {
                                   text: 'Join',
                                   onPressed: _isHosting || _isJoining
                                       ? null
-                                      : () => _handleJoin(room.address, room.gamePort),
+                                      : () => _handleJoin(
+                                          room.address,
+                                          room.gamePort,
+                                        ),
                                   variant: SWButtonVariant.secondary,
                                 ),
                               ],
@@ -234,7 +261,9 @@ class _LANBrowserPageState extends ConsumerState<LANBrowserPage> {
                             labelText: 'IP Address',
                             filled: true,
                             fillColor: colors.surface,
-                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.r)),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8.r),
+                            ),
                           ),
                         ),
                       ),
@@ -247,7 +276,9 @@ class _LANBrowserPageState extends ConsumerState<LANBrowserPage> {
                             labelText: 'Port',
                             filled: true,
                             fillColor: colors.surface,
-                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.r)),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8.r),
+                            ),
                           ),
                         ),
                       ),
@@ -260,7 +291,11 @@ class _LANBrowserPageState extends ConsumerState<LANBrowserPage> {
                         ? null
                         : () {
                             final ip = _manualIpController.text.trim();
-                            final port = int.tryParse(_manualPortController.text.trim()) ?? 18080;
+                            final port =
+                                int.tryParse(
+                                  _manualPortController.text.trim(),
+                                ) ??
+                                18080;
                             _handleJoin(ip, port);
                           },
                     variant: SWButtonVariant.secondary,

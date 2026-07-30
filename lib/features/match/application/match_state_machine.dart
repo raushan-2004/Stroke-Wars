@@ -32,19 +32,24 @@ class MatchStateMachine {
     if (fromState.runtimeType != toState.runtimeType) {
       final validation = validator.validateTransition(fromState, toState);
       if (!validation.isValid) {
-        return Failure(InvalidTransitionFailure(
-          validation.reason ?? 'Cannot transition from ${fromState.label} to ${toState.label}',
-        ));
+        return Failure(
+          InvalidTransitionFailure(
+            validation.reason ??
+                'Cannot transition from ${fromState.label} to ${toState.label}',
+          ),
+        );
       }
     }
 
-    return Success(StateTransition(
-      fromState: fromState,
-      toState: toState,
-      triggerCommand: triggerCommand,
-      generatedEvents: generatedEvents,
-      timestamp: timestamp,
-      transitionId: transitionId,
-    ));
+    return Success(
+      StateTransition(
+        fromState: fromState,
+        toState: toState,
+        triggerCommand: triggerCommand,
+        generatedEvents: generatedEvents,
+        timestamp: timestamp,
+        transitionId: transitionId,
+      ),
+    );
   }
 }

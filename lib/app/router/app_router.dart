@@ -4,6 +4,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'package:stroke_wars/features/practice/presentation/practice_page.dart';
 import 'package:stroke_wars/features/lan/presentation/lan_session_page.dart';
+import 'package:stroke_wars/features/online/presentation/online_session_page.dart';
 import 'package:stroke_wars/features/home/domain/repositories/dashboard_registry.dart';
 import 'package:stroke_wars/features/home/presentation/game_command_center_page.dart';
 import 'package:stroke_wars/features/home/presentation/placeholder_page.dart';
@@ -157,6 +158,13 @@ GoRouter appRouter(AppRouterRef ref) {
         name: 'lan',
         builder: (BuildContext context, GoRouterState state) {
           return const LANSessionPage();
+        },
+      ),
+      GoRoute(
+        path: '/online',
+        name: 'online',
+        builder: (BuildContext context, GoRouterState state) {
+          return const OnlineSessionPage();
         },
       ),
       GoRoute(

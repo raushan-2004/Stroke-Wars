@@ -78,12 +78,14 @@ class MatchCommandProcessor {
     controller.applyTransition(transition, outcome.mutatedMatch);
 
     final duration = clock.now.difference(startTime);
-    return Success(CommandResult(
-      resultingState: outcome.toState,
-      generatedEvents: outcome.events,
-      stateTransition: transition,
-      executionDuration: duration,
-    ));
+    return Success(
+      CommandResult(
+        resultingState: outcome.toState,
+        generatedEvents: outcome.events,
+        stateTransition: transition,
+        executionDuration: duration,
+      ),
+    );
   }
 
   Result<CommandContext> _buildContext(MatchCommand command) {
@@ -100,17 +102,21 @@ class MatchCommandProcessor {
         state: const MatchCreatedState(),
         createdAt: clock.now,
       );
-      return Success(CommandContext(
-        command: command,
-        currentMatch: mockMatch,
-        configuration: command.configuration,
-        clockState: controller.matchClock.current,
-        sequenceNumber: controller.sequenceGenerator.current + 1,
-      ));
+      return Success(
+        CommandContext(
+          command: command,
+          currentMatch: mockMatch,
+          configuration: command.configuration,
+          clockState: controller.matchClock.current,
+          sequenceNumber: controller.sequenceGenerator.current + 1,
+        ),
+      );
     }
 
     if (currentMatch == null) {
-      return const Failure(InvalidTransitionFailure('No active match loaded in controller.'));
+      return const Failure(
+        InvalidTransitionFailure('No active match loaded in controller.'),
+      );
     }
 
     String? playerId;
@@ -127,15 +133,17 @@ class MatchCommandProcessor {
       currentPlayer = currentMatch.playerByPlayerId(playerId);
     }
 
-    return Success(CommandContext(
-      command: command,
-      currentMatch: currentMatch,
-      currentRound: currentMatch.currentRound,
-      currentPlayer: currentPlayer,
-      configuration: currentMatch.configuration,
-      clockState: controller.matchClock.current,
-      sequenceNumber: controller.sequenceGenerator.current + 1,
-    ));
+    return Success(
+      CommandContext(
+        command: command,
+        currentMatch: currentMatch,
+        currentRound: currentMatch.currentRound,
+        currentPlayer: currentPlayer,
+        configuration: currentMatch.configuration,
+        clockState: controller.matchClock.current,
+        sequenceNumber: controller.sequenceGenerator.current + 1,
+      ),
+    );
   }
 
   Result<void> _validatePreconditions(CommandContext context) {
@@ -143,26 +151,40 @@ class MatchCommandProcessor {
     final match = context.currentMatch;
 
     // Check duplicate command
-    final isDuplicate = match.commandHistory.any((c) =>
-        c.runtimeType == cmd.runtimeType &&
-        _isDuplicateDetails(c, cmd));
+    final isDuplicate = match.commandHistory.any(
+      (c) => c.runtimeType == cmd.runtimeType && _isDuplicateDetails(c, cmd),
+    );
     if (isDuplicate) {
       return Failure(DuplicateCommandFailure(cmd.runtimeType.toString()));
     }
 
     if (cmd is JoinMatchCommand) {
-      if (match.state is! MatchCreatedState && match.state is! MatchWaitingState) {
-        return Failure(UnexpectedCommandFailure(cmd.runtimeType.toString(), match.state.label));
+      if (match.state is! MatchCreatedState &&
+          match.state is! MatchWaitingState) {
+        return Failure(
+          UnexpectedCommandFailure(
+            cmd.runtimeType.toString(),
+            match.state.label,
+          ),
+        );
       }
       final existing = match.playerByPlayerId(cmd.playerId);
       if (existing != null && existing.isConnected) {
-        return const Failure(InvalidTransitionFailure('Player already joined match.'));
+        return const Failure(
+          InvalidTransitionFailure('Player already joined match.'),
+        );
       }
     }
 
     if (cmd is ReadyPlayerCommand) {
-      if (match.state is! MatchWaitingState && match.state is! MatchCreatedState) {
-        return Failure(UnexpectedCommandFailure(cmd.runtimeType.toString(), match.state.label));
+      if (match.state is! MatchWaitingState &&
+          match.state is! MatchCreatedState) {
+        return Failure(
+          UnexpectedCommandFailure(
+            cmd.runtimeType.toString(),
+            match.state.label,
+          ),
+        );
       }
       if (context.currentPlayer == null) {
         return Failure(PlayerNotFoundFailure(cmd.playerId));
@@ -174,33 +196,57 @@ class MatchCommandProcessor {
 
     if (cmd is StartMatchCommand) {
       if (match.state is! MatchWaitingState) {
-        return Failure(UnexpectedCommandFailure(cmd.runtimeType.toString(), match.state.label));
+        return Failure(
+          UnexpectedCommandFailure(
+            cmd.runtimeType.toString(),
+            match.state.label,
+          ),
+        );
       }
       if (match.hostId != cmd.hostId) {
-        return const Failure(InvalidTransitionFailure('Only host can start the match.'));
+        return const Failure(
+          InvalidTransitionFailure('Only host can start the match.'),
+        );
       }
-      final readyRes = controller.validator.validateReadyToStart(match.players, match.configuration);
+      final readyRes = controller.validator.validateReadyToStart(
+        match.players,
+        match.configuration,
+      );
       if (!readyRes.isValid) {
-        return Failure(MatchNotReadyFailure(readyRes.reason ?? 'Match not ready.'));
+        return Failure(
+          MatchNotReadyFailure(readyRes.reason ?? 'Match not ready.'),
+        );
       }
     }
 
     if (cmd is ChooseWordCommand) {
       if (match.state is! WordSelectionState) {
-        return Failure(UnexpectedCommandFailure(cmd.runtimeType.toString(), match.state.label));
+        return Failure(
+          UnexpectedCommandFailure(
+            cmd.runtimeType.toString(),
+            match.state.label,
+          ),
+        );
       }
       if (context.currentRound == null) {
         return const Failure(InvalidTransitionFailure('No active round.'));
       }
       if (context.currentRound!.drawerSlotId != context.currentPlayer?.slotId &&
           context.currentRound!.drawerSlotId != cmd.drawerId) {
-        return const Failure(InvalidTransitionFailure('Only the drawer can choose the word.'));
+        return const Failure(
+          InvalidTransitionFailure('Only the drawer can choose the word.'),
+        );
       }
     }
 
     if (cmd is SubmitGuessCommand) {
       if (match.state is! DrawingState && match.state is! GuessingState) {
-        return Failure(UnexpectedCommandFailure(cmd.runtimeType.toString(), match.state.label));
+        return Failure(
+          UnexpectedCommandFailure(
+            cmd.runtimeType.toString(),
+            match.state.label,
+          ),
+        );
       }
       if (context.currentRound == null) {
         return const Failure(InvalidTransitionFailure('No active round.'));
@@ -209,12 +255,17 @@ class MatchCommandProcessor {
         return Failure(PlayerNotFoundFailure(cmd.playerId));
       }
       if (context.currentPlayer!.slotId == context.currentRound!.drawerSlotId) {
-        return const Failure(InvalidTransitionFailure('Drawer cannot submit guesses.'));
+        return const Failure(
+          InvalidTransitionFailure('Drawer cannot submit guesses.'),
+        );
       }
-      final alreadyGuessed = context.currentRound!.guesses.any((g) =>
-          g.playerId == cmd.playerId && g.result == GuessResult.correct);
+      final alreadyGuessed = context.currentRound!.guesses.any(
+        (g) => g.playerId == cmd.playerId && g.result == GuessResult.correct,
+      );
       if (alreadyGuessed) {
-        return const Failure(DuplicateCommandFailure('Correct guess already submitted.'));
+        return const Failure(
+          DuplicateCommandFailure('Correct guess already submitted.'),
+        );
       }
     }
 

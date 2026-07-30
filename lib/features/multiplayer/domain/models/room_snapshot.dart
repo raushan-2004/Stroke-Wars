@@ -40,28 +40,28 @@ class RoomSnapshot {
   final String? replayReference;
 
   Map<String, dynamic> toJson() => {
-        'snapshotVersion': snapshotVersion,
-        'generatedAt': generatedAt.toIso8601String(),
-        'sequenceNumber': sequenceNumber,
-        'matchSequence': matchSequence,
-        'room': room.toJson(),
-        'matchSnapshot': matchSnapshot?.toJson(),
-        'drawingEvents': drawingEvents.map((e) => e.toJson()).toList(),
-        'replayReference': replayReference,
-      };
+    'snapshotVersion': snapshotVersion,
+    'generatedAt': generatedAt.toIso8601String(),
+    'sequenceNumber': sequenceNumber,
+    'matchSequence': matchSequence,
+    'room': room.toJson(),
+    'matchSnapshot': matchSnapshot?.toJson(),
+    'drawingEvents': drawingEvents.map((e) => e.toJson()).toList(),
+    'replayReference': replayReference,
+  };
 
   factory RoomSnapshot.fromJson(Map<String, dynamic> json) => RoomSnapshot(
-        snapshotVersion: json['snapshotVersion'] as int,
-        generatedAt: DateTime.parse(json['generatedAt'] as String),
-        sequenceNumber: json['sequenceNumber'] as int,
-        matchSequence: json['matchSequence'] as int,
-        room: Room.fromJson(json['room'] as Map<String, dynamic>),
-        matchSnapshot: json['matchSnapshot'] != null
-            ? MatchSnapshot.fromJson(json['matchSnapshot'] as Map<String, dynamic>)
-            : null,
-        drawingEvents: (json['drawingEvents'] as List<dynamic>)
-            .map((e) => DrawingEvent.fromJson(e as Map<String, dynamic>))
-            .toList(),
-        replayReference: json['replayReference'] as String?,
-      );
+    snapshotVersion: json['snapshotVersion'] as int,
+    generatedAt: DateTime.parse(json['generatedAt'] as String),
+    sequenceNumber: json['sequenceNumber'] as int,
+    matchSequence: json['matchSequence'] as int,
+    room: Room.fromJson(json['room'] as Map<String, dynamic>),
+    matchSnapshot: json['matchSnapshot'] != null
+        ? MatchSnapshot.fromJson(json['matchSnapshot'] as Map<String, dynamic>)
+        : null,
+    drawingEvents: (json['drawingEvents'] as List<dynamic>)
+        .map((e) => DrawingEvent.fromJson(e as Map<String, dynamic>))
+        .toList(),
+    replayReference: json['replayReference'] as String?,
+  );
 }

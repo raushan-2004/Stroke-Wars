@@ -23,17 +23,17 @@ class PeerInfo {
 
   /// Converts this instance to a JSON map.
   Map<String, dynamic> toJson() => {
-        'id': id.value,
-        'displayName': displayName,
-        'address': address,
-        'port': port,
-      };
+    'id': id.value,
+    'displayName': displayName,
+    'address': address,
+    'port': port,
+  };
 
   /// Restores this instance from a JSON map.
   factory PeerInfo.fromJson(Map<String, dynamic> json) => PeerInfo(
-        id: PeerId(json['id'] as String),
-        displayName: json['displayName'] as String,
-        address: json['address'] as String,
-        port: json['port'] as int,
-      );
+    id: PeerId(json['id'] as String),
+    displayName: json['displayName'] as String,
+    address: json['address'] as String,
+    port: json['port'] as int,
+  );
 }

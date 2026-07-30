@@ -7,7 +7,10 @@ class PracticeStatisticsCollector {
   const PracticeStatisticsCollector();
 
   /// Processes drawing events and updates stroke-specific totals.
-  PracticeStatistics processDrawingEvent(PracticeStatistics stats, DrawingEvent event) {
+  PracticeStatistics processDrawingEvent(
+    PracticeStatistics stats,
+    DrawingEvent event,
+  ) {
     if (event is StrokeStarted) {
       final usage = Map<String, int>.from(stats.brushUsage);
       usage[event.brushId] = (usage[event.brushId] ?? 0) + 1;
@@ -31,7 +34,11 @@ class PracticeStatisticsCollector {
   }
 
   /// Accumulates active and idle timings.
-  PracticeStatistics processTimeTick(PracticeStatistics stats, double deltaSecs, bool isDrawing) {
+  PracticeStatistics processTimeTick(
+    PracticeStatistics stats,
+    double deltaSecs,
+    bool isDrawing,
+  ) {
     if (isDrawing) {
       return stats.copyWith(drawingDuration: stats.drawingDuration + deltaSecs);
     } else {
@@ -40,7 +47,10 @@ class PracticeStatisticsCollector {
   }
 
   /// Records round duration metrics when a round completes.
-  PracticeStatistics processRoundCompletion(PracticeStatistics stats, int roundDurationSecs) {
+  PracticeStatistics processRoundCompletion(
+    PracticeStatistics stats,
+    int roundDurationSecs,
+  ) {
     final completed = stats.totalRoundsCompleted + 1;
     final totalTime = stats.totalRoundTimeSecs + roundDurationSecs;
     return stats.copyWith(

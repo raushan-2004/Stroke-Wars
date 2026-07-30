@@ -40,11 +40,13 @@ class HostController {
     required this.matchEventBus,
     required this.drawingEventBus,
     SynchronizationManager? synchronizationManager,
-  }) : synchronizationManager = synchronizationManager ?? SynchronizationManager(
-          matchController: matchController,
-          canvasController: canvasController,
-          onStateChanged: (_, __) {},
-        ) {
+  }) : synchronizationManager =
+           synchronizationManager ??
+           SynchronizationManager(
+             matchController: matchController,
+             canvasController: canvasController,
+             onStateChanged: (_, __) {},
+           ) {
     _init();
   }
 
@@ -57,7 +59,8 @@ class HostController {
   final SynchronizationManager synchronizationManager;
 
   Room? _room;
-  final StreamController<Room> _roomStreamController = StreamController<Room>.broadcast();
+  final StreamController<Room> _roomStreamController =
+      StreamController<Room>.broadcast();
 
   StreamSubscription<NetworkEnvelope>? _inboundMessageSub;
   StreamSubscription<String>? _peerTimeoutSub;
@@ -68,8 +71,12 @@ class HostController {
   Stream<Room> get onRoomChanged => _roomStreamController.stream;
 
   void _init() {
-    _inboundMessageSub = connectionManager.inboundMessages.listen(_handleInboundMessage);
-    _peerTimeoutSub = connectionManager.onPeerTimeout.listen(_handlePeerTimeout);
+    _inboundMessageSub = connectionManager.inboundMessages.listen(
+      _handleInboundMessage,
+    );
+    _peerTimeoutSub = connectionManager.onPeerTimeout.listen(
+      _handlePeerTimeout,
+    );
 
     // Event pipeline: Listen to local match events and broadcast them to clients
     _matchEventSub = matchEventBus.stream.listen((event) {
@@ -100,7 +107,9 @@ class HostController {
       ],
     );
     _roomStreamController.add(_room!);
-    AppLogger.instance.info('Room ${id.value} created by host: ${hostInfo.displayName}');
+    AppLogger.instance.info(
+      'Room ${id.value} created by host: ${hostInfo.displayName}',
+    );
   }
 
   void _handleInboundMessage(NetworkEnvelope envelope) {
@@ -125,7 +134,8 @@ class HostController {
         message: msg,
         isHost: true,
         activeDrawerId: matchController.match?.currentRound?.drawerSlotId,
-        roomPlayerIds: _room?.players.map((p) => p.peerInfo.id.value).toList() ?? const [],
+        roomPlayerIds:
+            _room?.players.map((p) => p.peerInfo.id.value).toList() ?? const [],
         connectionIdToPlayerIdMap: connectionIdToPlayerIdMap,
       );
 
@@ -145,7 +155,9 @@ class HostController {
         _applyDrawingEventToHost(msg.event);
       }
     } catch (e) {
-      AppLogger.instance.error('HostController error handling inbound message: $e');
+      AppLogger.instance.error(
+        'HostController error handling inbound message: $e',
+      );
     }
   }
 
@@ -164,7 +176,10 @@ class HostController {
     // Check if player already in lobby
     if (_room!.players.any((p) => p.peerInfo.id == peer.id)) {
       connectionManager.sendPayload(
-        const ErrorMessage(code: 'ALREADY_JOINED', message: 'Player has already joined this room'),
+        const ErrorMessage(
+          code: 'ALREADY_JOINED',
+          message: 'Player has already joined this room',
+        ),
         targetPeerId: connectionId,
       );
       return;
@@ -177,7 +192,8 @@ class HostController {
       lastSeen: DateTime.now(),
     );
 
-    final updatedPlayers = List<PlayerConnection>.from(_room!.players)..add(newPlayer);
+    final updatedPlayers = List<PlayerConnection>.from(_room!.players)
+      ..add(newPlayer);
     _room = _room!.copyWith(players: updatedPlayers);
     _roomStreamController.add(_room!);
 
@@ -200,16 +216,22 @@ class HostController {
   void _handleLeaveRoom(String connectionId) {
     if (_room == null) return;
 
-    final index = _room!.players.indexWhere((p) =>
-        p.peerInfo.id.value == connectionId || p.peerInfo.address == connectionId.split(':').first);
+    final index = _room!.players.indexWhere(
+      (p) =>
+          p.peerInfo.id.value == connectionId ||
+          p.peerInfo.address == connectionId.split(':').first,
+    );
     if (index == -1) return;
 
     final leavingPeer = _room!.players[index];
-    final updatedPlayers = List<PlayerConnection>.from(_room!.players)..removeAt(index);
+    final updatedPlayers = List<PlayerConnection>.from(_room!.players)
+      ..removeAt(index);
     _room = _room!.copyWith(players: updatedPlayers);
     _roomStreamController.add(_room!);
 
-    AppLogger.instance.info('Player ${leavingPeer.peerInfo.displayName} left lobby');
+    AppLogger.instance.info(
+      'Player ${leavingPeer.peerInfo.displayName} left lobby',
+    );
 
     // Notify match engine
     if (matchController.match != null) {
@@ -232,7 +254,8 @@ class HostController {
     if (_room == null) return;
 
     final updatedPlayers = _room!.players.map((p) {
-      if (p.peerInfo.id.value == connectionId || p.peerInfo.address == connectionId.split(':').first) {
+      if (p.peerInfo.id.value == connectionId ||
+          p.peerInfo.address == connectionId.split(':').first) {
         return p.copyWith(isReady: isReady);
       }
       return p;
@@ -243,8 +266,11 @@ class HostController {
 
     // Forward ready toggle command to Match engine if active
     if (matchController.match != null) {
-      final player = _room!.players.firstWhere((p) =>
-          p.peerInfo.id.value == connectionId || p.peerInfo.address == connectionId.split(':').first);
+      final player = _room!.players.firstWhere(
+        (p) =>
+            p.peerInfo.id.value == connectionId ||
+            p.peerInfo.address == connectionId.split(':').first,
+      );
       final cmd = ReadyPlayerCommand(
         matchId: matchController.match!.id,
         playerId: player.peerInfo.id.value,
@@ -299,7 +325,10 @@ class HostController {
 
   void _sendSnapshotTo(String connectionId) {
     final snap = _generateSnapshot();
-    connectionManager.sendPayload(SnapshotMessage(snapshot: snap), targetPeerId: connectionId);
+    connectionManager.sendPayload(
+      SnapshotMessage(snapshot: snap),
+      targetPeerId: connectionId,
+    );
   }
 
   RoomSnapshot _generateSnapshot() {

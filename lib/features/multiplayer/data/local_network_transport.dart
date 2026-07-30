@@ -21,7 +21,8 @@ class LocalNetworkTransport implements GameTransport {
   final StreamController<TransportConnectionState> _stateController =
       StreamController<TransportConnectionState>.broadcast();
 
-  TransportConnectionState _currentState = TransportConnectionState.disconnected;
+  TransportConnectionState _currentState =
+      TransportConnectionState.disconnected;
 
   void _updateState(TransportConnectionState newState) {
     if (_currentState == newState) return;
@@ -34,7 +35,8 @@ class LocalNetworkTransport implements GameTransport {
   Stream<TransportMessage> get messages => _messageController.stream;
 
   @override
-  Stream<TransportConnectionState> get connectionState => _stateController.stream;
+  Stream<TransportConnectionState> get connectionState =>
+      _stateController.stream;
 
   @override
   Future<void> connect(String address, int port) async {
@@ -63,7 +65,11 @@ class LocalNetworkTransport implements GameTransport {
     } else {
       try {
         // Client mode: Connect to Host
-        _clientSocket = await Socket.connect(address, port, timeout: const Duration(seconds: 5));
+        _clientSocket = await Socket.connect(
+          address,
+          port,
+          timeout: const Duration(seconds: 5),
+        );
         _updateState(TransportConnectionState.connected);
         AppLogger.instance.info('Client connected to Host at $address:$port');
 
@@ -73,18 +79,20 @@ class LocalNetworkTransport implements GameTransport {
             .transform(utf8.decoder)
             .transform(const LineSplitter())
             .listen(
-          (String line) {
-            _messageController.add(TransportMessage(senderId: hostId, content: line));
-          },
-          onError: (Object error) {
-            AppLogger.instance.error('Client socket stream error: $error');
-            _updateState(TransportConnectionState.failed);
-          },
-          onDone: () {
-            AppLogger.instance.info('Client socket disconnected by server');
-            disconnect();
-          },
-        );
+              (String line) {
+                _messageController.add(
+                  TransportMessage(senderId: hostId, content: line),
+                );
+              },
+              onError: (Object error) {
+                AppLogger.instance.error('Client socket stream error: $error');
+                _updateState(TransportConnectionState.failed);
+              },
+              onDone: () {
+                AppLogger.instance.info('Client socket disconnected by server');
+                disconnect();
+              },
+            );
       } catch (e) {
         AppLogger.instance.error('Client failed to connect: $e');
         _updateState(TransportConnectionState.failed);
@@ -94,7 +102,8 @@ class LocalNetworkTransport implements GameTransport {
   }
 
   void _handleIncomingConnection(Socket socket) {
-    final String connId = '${socket.remoteAddress.address}:${socket.remotePort}';
+    final String connId =
+        '${socket.remoteAddress.address}:${socket.remotePort}';
     _connections[connId] = socket;
     AppLogger.instance.info('New connection accepted: $connId');
 
@@ -103,18 +112,20 @@ class LocalNetworkTransport implements GameTransport {
         .transform(utf8.decoder)
         .transform(const LineSplitter())
         .listen(
-      (String line) {
-        _messageController.add(TransportMessage(senderId: connId, content: line));
-      },
-      onError: (Object error) {
-        AppLogger.instance.error('Error on socket $connId: $error');
-        _closeConnection(connId);
-      },
-      onDone: () {
-        AppLogger.instance.info('Socket $connId closed');
-        _closeConnection(connId);
-      },
-    );
+          (String line) {
+            _messageController.add(
+              TransportMessage(senderId: connId, content: line),
+            );
+          },
+          onError: (Object error) {
+            AppLogger.instance.error('Error on socket $connId: $error');
+            _closeConnection(connId);
+          },
+          onDone: () {
+            AppLogger.instance.info('Socket $connId closed');
+            _closeConnection(connId);
+          },
+        );
   }
 
   void _closeConnection(String connId) {
@@ -154,7 +165,9 @@ class LocalNetworkTransport implements GameTransport {
         socket.write('$message\n');
         await socket.flush();
       } else {
-        AppLogger.instance.warning('Cannot send message, peerId $peerId not found');
+        AppLogger.instance.warning(
+          'Cannot send message, peerId $peerId not found',
+        );
       }
     } else {
       if (_clientSocket != null) {

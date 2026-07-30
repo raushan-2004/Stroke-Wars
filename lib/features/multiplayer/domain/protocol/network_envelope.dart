@@ -46,19 +46,20 @@ class NetworkEnvelope {
   final Map<String, dynamic> payload;
 
   Map<String, dynamic> toJson() => {
-        'messageId': messageId.value,
-        'sessionId': sessionId.value,
-        'connectionId': connectionId.value,
-        'protocolVersion': protocolVersion,
-        'engineVersion': engineVersion,
-        'sequenceNumber': sequenceNumber,
-        'acknowledgementNumber': acknowledgementNumber,
-        'timestamp': timestamp.toIso8601String(),
-        'payloadType': payloadType,
-        'payload': payload,
-      };
+    'messageId': messageId.value,
+    'sessionId': sessionId.value,
+    'connectionId': connectionId.value,
+    'protocolVersion': protocolVersion,
+    'engineVersion': engineVersion,
+    'sequenceNumber': sequenceNumber,
+    'acknowledgementNumber': acknowledgementNumber,
+    'timestamp': timestamp.toIso8601String(),
+    'payloadType': payloadType,
+    'payload': payload,
+  };
 
-  factory NetworkEnvelope.fromJson(Map<String, dynamic> json) => NetworkEnvelope(
+  factory NetworkEnvelope.fromJson(Map<String, dynamic> json) =>
+      NetworkEnvelope(
         messageId: MessageId(json['messageId'] as String),
         sessionId: SessionId(json['sessionId'] as String),
         connectionId: ConnectionId(json['connectionId'] as String),

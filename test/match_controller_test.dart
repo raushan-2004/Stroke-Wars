@@ -56,37 +56,37 @@ void main() {
       bus.dispose();
     });
 
-    test('CreateMatchCommand initializes match and transitions to waiting state', () async {
-      final events = <MatchEvent>[];
-      final sub = bus.stream.listen(events.add);
+    test(
+      'CreateMatchCommand initializes match and transitions to waiting state',
+      () async {
+        final events = <MatchEvent>[];
+        final sub = bus.stream.listen(events.add);
 
-      const config = MatchConfiguration(
-        minPlayers: 2,
-        maxPlayers: 4,
-        totalRounds: 3,
-      );
+        const config = MatchConfiguration(
+          minPlayers: 2,
+          maxPlayers: 4,
+          totalRounds: 3,
+        );
 
-      await controller.execute(
-        const CreateMatchCommand(
-          hostId: 'host-123',
-          configuration: config,
-        ),
-      );
+        await controller.execute(
+          const CreateMatchCommand(hostId: 'host-123', configuration: config),
+        );
 
-      expect(controller.match, isNotNull);
-      expect(controller.match!.state, isA<MatchWaitingState>());
-      expect(controller.match!.hostId, 'host-123');
-      expect(controller.match!.players.length, 1);
-      expect(controller.match!.players.first.playerId, 'host-123');
-      expect(controller.match!.players.first.role, PlayerRole.host);
+        expect(controller.match, isNotNull);
+        expect(controller.match!.state, isA<MatchWaitingState>());
+        expect(controller.match!.hostId, 'host-123');
+        expect(controller.match!.players.length, 1);
+        expect(controller.match!.players.first.playerId, 'host-123');
+        expect(controller.match!.players.first.role, PlayerRole.host);
 
-      expect(events.length, 1);
-      expect(events[0], isA<MatchCreatedEvent>());
-      final createdEvent = events[0] as MatchCreatedEvent;
-      expect(createdEvent.hostId, 'host-123');
+        expect(events.length, 1);
+        expect(events[0], isA<MatchCreatedEvent>());
+        final createdEvent = events[0] as MatchCreatedEvent;
+        expect(createdEvent.hostId, 'host-123');
 
-      await sub.cancel();
-    });
+        await sub.cancel();
+      },
+    );
 
     test('JoinMatchCommand adds player to waiting match', () async {
       final events = <MatchEvent>[];
@@ -138,10 +138,7 @@ void main() {
       );
 
       await controller.execute(
-        LeaveMatchCommand(
-          matchId: controller.match!.id,
-          playerId: 'player-2',
-        ),
+        LeaveMatchCommand(matchId: controller.match!.id, playerId: 'player-2'),
       );
 
       expect(controller.match!.players[1].isConnected, isFalse);
@@ -168,14 +165,13 @@ void main() {
       );
 
       // Make Bob and Host ready
-      final updatedPlayers = controller.match!.players.map((p) => p.copyWith(isReady: true)).toList();
+      final updatedPlayers = controller.match!.players
+          .map((p) => p.copyWith(isReady: true))
+          .toList();
       controller.match = controller.match!.copyWith(players: updatedPlayers);
 
       await controller.execute(
-        StartMatchCommand(
-          matchId: controller.match!.id,
-          hostId: 'host-123',
-        ),
+        StartMatchCommand(matchId: controller.match!.id, hostId: 'host-123'),
       );
 
       expect(controller.match!.state, isA<MatchStartingState>());
@@ -184,118 +180,141 @@ void main() {
       await sub.cancel();
     });
 
-    test('Full gameplay flow: choose word, guess, end round, and finish match', () async {
-      final events = <MatchEvent>[];
-      final sub = bus.stream.listen(events.add);
+    test(
+      'Full gameplay flow: choose word, guess, end round, and finish match',
+      () async {
+        final events = <MatchEvent>[];
+        final sub = bus.stream.listen(events.add);
 
-      // 1. Create match
-      await controller.execute(
-        const CreateMatchCommand(
-          hostId: 'host-123',
-          configuration: MatchConfiguration(
-            minPlayers: 2,
-            allowedCategories: [WordCategory.animals],
+        // 1. Create match
+        await controller.execute(
+          const CreateMatchCommand(
+            hostId: 'host-123',
+            configuration: MatchConfiguration(
+              minPlayers: 2,
+              allowedCategories: [WordCategory.animals],
+            ),
           ),
-        ),
-      );
+        );
 
-      // 2. Bob Joins
-      await controller.execute(
-        JoinMatchCommand(
-          matchId: controller.match!.id,
-          playerId: 'player-2',
-          displayName: 'Bob',
-        ),
-      );
+        // 2. Bob Joins
+        await controller.execute(
+          JoinMatchCommand(
+            matchId: controller.match!.id,
+            playerId: 'player-2',
+            displayName: 'Bob',
+          ),
+        );
 
-      // Set ready
-      controller.match = controller.match!.copyWith(
-        players: controller.match!.players.map((p) => p.copyWith(isReady: true)).toList(),
-      );
+        // Set ready
+        controller.match = controller.match!.copyWith(
+          players: controller.match!.players
+              .map((p) => p.copyWith(isReady: true))
+              .toList(),
+        );
 
-      // 3. Start Match
-      await controller.execute(
-        StartMatchCommand(
-          matchId: controller.match!.id,
-          hostId: 'host-123',
-        ),
-      );
+        // 3. Start Match
+        await controller.execute(
+          StartMatchCommand(matchId: controller.match!.id, hostId: 'host-123'),
+        );
 
-      // Transition validator allows starting state to transition directly to word selection when starting round
-      controller.match = controller.match!.copyWith(state: const MatchStartingState());
+        // Transition validator allows starting state to transition directly to word selection when starting round
+        controller.match = controller.match!.copyWith(
+          state: const MatchStartingState(),
+        );
 
-      // 4. Start Round 1
-      await controller.execute(StartRoundCommand(matchId: controller.match!.id));
+        // 4. Start Round 1
+        await controller.execute(
+          StartRoundCommand(matchId: controller.match!.id),
+        );
 
-      expect(controller.match!.state, isA<WordSelectionState>());
-      expect(controller.match!.currentRound, isNotNull);
-      expect(controller.match!.currentRound!.wordOptions.length, 3);
+        expect(controller.match!.state, isA<WordSelectionState>());
+        expect(controller.match!.currentRound, isNotNull);
+        expect(controller.match!.currentRound!.wordOptions.length, 3);
 
-      final wordChoice = controller.match!.currentRound!.wordOptions.first;
-      final drawerId = controller.match!.players.firstWhere((p) => p.role == PlayerRole.drawer).playerId;
+        final wordChoice = controller.match!.currentRound!.wordOptions.first;
+        final drawerId = controller.match!.players
+            .firstWhere((p) => p.role == PlayerRole.drawer)
+            .playerId;
 
-      // 5. Choose Word
-      await controller.execute(
-        ChooseWordCommand(
-          matchId: controller.match!.id,
-          drawerId: drawerId,
-          wordId: wordChoice.id,
-        ),
-      );
+        // 5. Choose Word
+        await controller.execute(
+          ChooseWordCommand(
+            matchId: controller.match!.id,
+            drawerId: drawerId,
+            wordId: wordChoice.id,
+          ),
+        );
 
-      expect(controller.match!.state, isA<DrawingState>());
-      expect(controller.match!.currentRound!.state, isA<RoundActiveState>());
-      expect(controller.match!.currentRound!.word, wordChoice);
+        expect(controller.match!.state, isA<DrawingState>());
+        expect(controller.match!.currentRound!.state, isA<RoundActiveState>());
+        expect(controller.match!.currentRound!.word, wordChoice);
 
-      // 6. Submit incorrect and correct guesses
-      final guesser = controller.match!.players.firstWhere((p) => p.playerId != drawerId);
-      
-      await controller.execute(
-        SubmitGuessCommand(
-          matchId: controller.match!.id,
-          playerId: guesser.playerId,
-          guessText: 'wrongguess',
-        ),
-      );
+        // 6. Submit incorrect and correct guesses
+        final guesser = controller.match!.players.firstWhere(
+          (p) => p.playerId != drawerId,
+        );
 
-      expect(controller.match!.currentRound!.guesses.length, 1);
-      expect(controller.match!.currentRound!.guesses.first.result, GuessResult.incorrect);
+        await controller.execute(
+          SubmitGuessCommand(
+            matchId: controller.match!.id,
+            playerId: guesser.playerId,
+            guessText: 'wrongguess',
+          ),
+        );
 
-      await controller.execute(
-        SubmitGuessCommand(
-          matchId: controller.match!.id,
-          playerId: guesser.playerId,
-          guessText: wordChoice.text,
-        ),
-      );
+        expect(controller.match!.currentRound!.guesses.length, 1);
+        expect(
+          controller.match!.currentRound!.guesses.first.result,
+          GuessResult.incorrect,
+        );
 
-      expect(controller.match!.currentRound!.guesses.length, 2);
-      expect(controller.match!.currentRound!.guesses[1].result, GuessResult.correct);
+        await controller.execute(
+          SubmitGuessCommand(
+            matchId: controller.match!.id,
+            playerId: guesser.playerId,
+            guessText: wordChoice.text,
+          ),
+        );
 
-      // 7. End the round
-      // Adjust states manually to make transition validator happy if needed
-      controller.match = controller.match!.copyWith(state: const DrawingState());
+        expect(controller.match!.currentRound!.guesses.length, 2);
+        expect(
+          controller.match!.currentRound!.guesses[1].result,
+          GuessResult.correct,
+        );
 
-      await controller.execute(
-        EndRoundCommand(
-          matchId: controller.match!.id,
-          reason: 'time_expired',
-        ),
-      );
+        // 7. End the round
+        // Adjust states manually to make transition validator happy if needed
+        controller.match = controller.match!.copyWith(
+          state: const DrawingState(),
+        );
 
-      expect(controller.match!.state, isA<RoundFinishedState>());
-      expect(controller.match!.currentRound!.state, isA<RoundFinishedRoundState>());
-      // Drawer should receive bonus, guesser receives correct guess points
-      expect(controller.match!.currentRound!.scores.length, 2);
+        await controller.execute(
+          EndRoundCommand(
+            matchId: controller.match!.id,
+            reason: 'time_expired',
+          ),
+        );
 
-      // 8. Finish the match
-      await controller.execute(FinishMatchCommand(matchId: controller.match!.id));
+        expect(controller.match!.state, isA<RoundFinishedState>());
+        expect(
+          controller.match!.currentRound!.state,
+          isA<RoundFinishedRoundState>(),
+        );
+        // Drawer should receive bonus, guesser receives correct guess points
+        expect(controller.match!.currentRound!.scores.length, 2);
 
-      expect(controller.match!.state, isA<MatchFinishedState>());
-      expect(controller.match!.result, isNotNull);
+        // 8. Finish the match
+        await controller.execute(
+          FinishMatchCommand(matchId: controller.match!.id),
+        );
 
-      await sub.cancel();
-    });
+        expect(controller.match!.state, isA<MatchFinishedState>());
+        expect(controller.match!.result, isNotNull);
+
+        await sub.cancel();
+      },
+    );
 
     test('CancelMatchCommand transitions state to cancelled', () async {
       await controller.execute(
@@ -306,10 +325,7 @@ void main() {
       );
 
       await controller.execute(
-        CancelMatchCommand(
-          matchId: controller.match!.id,
-          reason: 'host_left',
-        ),
+        CancelMatchCommand(matchId: controller.match!.id, reason: 'host_left'),
       );
 
       expect(controller.match!.state, isA<MatchCancelledState>());

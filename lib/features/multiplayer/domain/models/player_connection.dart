@@ -37,15 +37,18 @@ class PlayerConnection {
   }
 
   Map<String, dynamic> toJson() => {
-        'peerInfo': peerInfo.toJson(),
-        'connectionState': connectionState.name,
-        'isReady': isReady,
-        'lastSeen': lastSeen.toIso8601String(),
-      };
+    'peerInfo': peerInfo.toJson(),
+    'connectionState': connectionState.name,
+    'isReady': isReady,
+    'lastSeen': lastSeen.toIso8601String(),
+  };
 
-  factory PlayerConnection.fromJson(Map<String, dynamic> json) => PlayerConnection(
+  factory PlayerConnection.fromJson(Map<String, dynamic> json) =>
+      PlayerConnection(
         peerInfo: PeerInfo.fromJson(json['peerInfo'] as Map<String, dynamic>),
-        connectionState: NetworkConnectionState.values.byName(json['connectionState'] as String),
+        connectionState: NetworkConnectionState.values.byName(
+          json['connectionState'] as String,
+        ),
         isReady: json['isReady'] as bool,
         lastSeen: DateTime.parse(json['lastSeen'] as String),
       );

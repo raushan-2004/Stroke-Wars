@@ -25,10 +25,9 @@ class MatchContext {
     match: match,
     configuration: match.configuration,
     currentRound: match.currentRound,
-    currentDrawer:
-        match.currentRound != null
-            ? match.playerBySlotId(match.currentRound!.drawerSlotId)
-            : null,
+    currentDrawer: match.currentRound != null
+        ? match.playerBySlotId(match.currentRound!.drawerSlotId)
+        : null,
     currentWord: match.currentRound?.word,
     timerState: match.currentRound?.timerState,
   );

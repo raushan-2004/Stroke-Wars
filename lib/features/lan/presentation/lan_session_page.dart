@@ -66,7 +66,11 @@ class LANSessionPage extends ConsumerWidget {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text('Connection Interrupted', textAlign: TextAlign.center, style: typography.heading),
+                  Text(
+                    'Connection Interrupted',
+                    textAlign: TextAlign.center,
+                    style: typography.heading,
+                  ),
                   SizedBox(height: spacing.md),
                   Text(
                     'The connection to the LAN session was lost. Attempting to recover or exit.',
@@ -100,7 +104,10 @@ class LANSessionPage extends ConsumerWidget {
                   context.pop();
                 },
               ),
-              title: Text('LAN Battle', style: typography.body.copyWith(fontWeight: FontWeight.bold)),
+              title: Text(
+                'LAN Battle',
+                style: typography.body.copyWith(fontWeight: FontWeight.bold),
+              ),
             )
           : null,
       body: Stack(

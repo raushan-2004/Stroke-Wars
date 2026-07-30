@@ -134,8 +134,7 @@ class ScoringEngine {
     WordDifficulty difficulty = WordDifficulty.medium,
   }) {
     if (!rules.canAwardDrawerBonus(correctGuessCount)) return null;
-    final base =
-        ScoreRules.drawerBonusPerGuesser * correctGuessCount;
+    final base = ScoreRules.drawerBonusPerGuesser * correctGuessCount;
     final total = (base * difficulty.pointMultiplier).round();
     return ScoringResult(
       playerId: drawerId,

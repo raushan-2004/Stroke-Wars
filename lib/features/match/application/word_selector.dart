@@ -57,18 +57,17 @@ class WordSelector {
 
   /// Builds [Word] objects from the host's custom word strings.
   List<Word> _buildCustomWords(List<String> wordTexts, int count) {
-    final words =
-        wordTexts
-            .where((t) => t.trim().isNotEmpty)
-            .map(
-              (t) => Word(
-                id: 'custom_${t.toLowerCase().replaceAll(' ', '_')}',
-                text: t.trim(),
-                difficulty: WordDifficulty.medium,
-                category: WordCategory.random,
-              ),
-            )
-            .toList();
+    final words = wordTexts
+        .where((t) => t.trim().isNotEmpty)
+        .map(
+          (t) => Word(
+            id: 'custom_${t.toLowerCase().replaceAll(' ', '_')}',
+            text: t.trim(),
+            difficulty: WordDifficulty.medium,
+            category: WordCategory.random,
+          ),
+        )
+        .toList();
     final shuffled = random.shuffle(words);
     return shuffled.take(count).toList();
   }

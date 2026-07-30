@@ -105,8 +105,15 @@ void main() {
           const GuessingState(),
         ];
         for (final state in activeStates) {
-          final result = validator.validateTransition(state, const MatchCancelledState());
-          expect(result.isValid, isTrue, reason: 'State ${state.label} should allow cancel');
+          final result = validator.validateTransition(
+            state,
+            const MatchCancelledState(),
+          );
+          expect(
+            result.isValid,
+            isTrue,
+            reason: 'State ${state.label} should allow cancel',
+          );
         }
       });
 
@@ -175,7 +182,12 @@ void main() {
       test('joining when space is available passes', () {
         const config = MatchConfiguration(maxPlayers: 4);
         final players = [
-          const PlayerSlot(slotId: 's1', playerId: 'p1', displayName: 'Alice', role: PlayerRole.host),
+          const PlayerSlot(
+            slotId: 's1',
+            playerId: 'p1',
+            displayName: 'Alice',
+            role: PlayerRole.host,
+          ),
         ];
         final result = validator.validatePlayerJoin(players, config);
         expect(result.isValid, isTrue);
@@ -184,8 +196,18 @@ void main() {
       test('joining when match is full fails', () {
         const config = MatchConfiguration(maxPlayers: 2);
         final players = [
-          const PlayerSlot(slotId: 's1', playerId: 'p1', displayName: 'Alice', role: PlayerRole.host),
-          const PlayerSlot(slotId: 's2', playerId: 'p2', displayName: 'Bob', role: PlayerRole.guesser),
+          const PlayerSlot(
+            slotId: 's1',
+            playerId: 'p1',
+            displayName: 'Alice',
+            role: PlayerRole.host,
+          ),
+          const PlayerSlot(
+            slotId: 's2',
+            playerId: 'p2',
+            displayName: 'Bob',
+            role: PlayerRole.guesser,
+          ),
         ];
         final result = validator.validatePlayerJoin(players, config);
         expect(result.isValid, isFalse);
@@ -196,8 +218,18 @@ void main() {
       test('enough players passes', () {
         const config = MatchConfiguration(minPlayers: 2);
         final players = [
-          const PlayerSlot(slotId: 's1', playerId: 'p1', displayName: 'Alice', role: PlayerRole.host),
-          const PlayerSlot(slotId: 's2', playerId: 'p2', displayName: 'Bob', role: PlayerRole.guesser),
+          const PlayerSlot(
+            slotId: 's1',
+            playerId: 'p1',
+            displayName: 'Alice',
+            role: PlayerRole.host,
+          ),
+          const PlayerSlot(
+            slotId: 's2',
+            playerId: 'p2',
+            displayName: 'Bob',
+            role: PlayerRole.guesser,
+          ),
         ];
         final result = validator.validateReadyToStart(players, config);
         expect(result.isValid, isTrue);
@@ -206,7 +238,12 @@ void main() {
       test('not enough players fails', () {
         const config = MatchConfiguration(minPlayers: 3);
         final players = [
-          const PlayerSlot(slotId: 's1', playerId: 'p1', displayName: 'Alice', role: PlayerRole.host),
+          const PlayerSlot(
+            slotId: 's1',
+            playerId: 'p1',
+            displayName: 'Alice',
+            role: PlayerRole.host,
+          ),
         ];
         final result = validator.validateReadyToStart(players, config);
         expect(result.isValid, isFalse);
@@ -276,9 +313,10 @@ void main() {
       final words = await selector.selectWordsForRound(config);
       expect(words.length, 2);
       final texts = words.map((w) => w.text).toSet();
-      expect(texts.every(
-        (t) => ['Banana', 'Spacecraft', 'Cello'].contains(t),
-      ), isTrue);
+      expect(
+        texts.every((t) => ['Banana', 'Spacecraft', 'Cello'].contains(t)),
+        isTrue,
+      );
     });
 
     test('seeded selector produces deterministic word order', () async {
@@ -326,10 +364,13 @@ void main() {
       expect(ids, containsAll(['a_easy_01', 'f_easy_01']));
     });
 
-    test('DefaultWordList getAvailableCategories returns all categories', () async {
-      final cats = await repo.getAvailableCategories();
-      expect(cats.length, WordCategory.values.length);
-    });
+    test(
+      'DefaultWordList getAvailableCategories returns all categories',
+      () async {
+        final cats = await repo.getAvailableCategories();
+        expect(cats.length, WordCategory.values.length);
+      },
+    );
   });
 
   // ────────────────────────────────────────────

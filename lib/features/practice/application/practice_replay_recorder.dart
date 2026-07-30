@@ -28,7 +28,11 @@ class PracticeReplayRecorder {
   }
 
   /// Records state machine transition milestones.
-  void recordRoundTransition(String fromState, String toState, DateTime timestamp) {
+  void recordRoundTransition(
+    String fromState,
+    String toState,
+    DateTime timestamp,
+  ) {
     _records.add({
       'type': 'round_transition',
       'timestamp': timestamp.millisecondsSinceEpoch,

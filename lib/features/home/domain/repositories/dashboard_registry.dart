@@ -53,6 +53,15 @@ class DashboardRegistry {
         stage: 'Stage 5',
       ),
       DashboardModule(
+        id: 'online_play',
+        title: 'Online Play',
+        subtitle: 'Play over the Internet with players globally.',
+        icon: Icons.public_rounded,
+        route: '/online',
+        featureState: FeatureState.enabled,
+        stage: 'Stage 7',
+      ),
+      DashboardModule(
         id: 'practice_mode',
         title: 'Practice Mode',
         subtitle: 'Refine your sketching speed and precision.',

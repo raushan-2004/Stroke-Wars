@@ -19,7 +19,9 @@ class StateTransition {
     return StateTransition(
       fromState: _stateFromJson(json['fromState'] as String),
       toState: _stateFromJson(json['toState'] as String),
-      triggerCommand: _commandFromJson(json['triggerCommand'] as Map<String, dynamic>),
+      triggerCommand: _commandFromJson(
+        json['triggerCommand'] as Map<String, dynamic>,
+      ),
       generatedEvents: (json['generatedEvents'] as List<dynamic>)
           .map((e) => MatchEvent.fromJson(e as Map<String, dynamic>))
           .toList(),

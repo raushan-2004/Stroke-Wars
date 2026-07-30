@@ -8,7 +8,8 @@ import 'package:stroke_wars/features/canvas/domain/models/drawing_event.dart';
 import 'package:stroke_wars/features/canvas/presentation/widgets/drawing_canvas.dart';
 import 'package:stroke_wars/features/lan/providers/lan_providers.dart';
 import 'package:stroke_wars/features/lan/domain/models/lan_session_models.dart';
-import 'package:stroke_wars/features/match/domain/models/match.dart' as gameplay;
+import 'package:stroke_wars/features/match/domain/models/match.dart'
+    as gameplay;
 import 'package:stroke_wars/features/match/domain/models/match_state.dart';
 import 'package:stroke_wars/features/profile/application/player_service.dart';
 import 'package:stroke_wars/shared/design_language/swdl.dart';
@@ -127,26 +128,46 @@ class _LANGamePageState extends ConsumerState<LANGamePage> {
                   child: Padding(
                     padding: EdgeInsets.symmetric(horizontal: spacing.md.r),
                     child: SWGlassCard(
-                      padding: EdgeInsets.symmetric(horizontal: spacing.md.r, vertical: spacing.xs.r),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: spacing.md.r,
+                        vertical: spacing.xs.r,
+                      ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
                           Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Text('ROUND', style: typography.caption.copyWith(color: colors.textMuted)),
-                              Text('${match.rounds.length}/${match.configuration.totalRounds}',
-                                  style: typography.body.copyWith(fontWeight: FontWeight.bold)),
+                              Text(
+                                'ROUND',
+                                style: typography.caption.copyWith(
+                                  color: colors.textMuted,
+                                ),
+                              ),
+                              Text(
+                                '${match.rounds.length}/${match.configuration.totalRounds}',
+                                style: typography.body.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                             ],
                           ),
                           if (round?.word != null && isLocalDrawer)
                             Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Text('DRAW WORD', style: typography.caption.copyWith(color: colors.textMuted)),
+                                Text(
+                                  'DRAW WORD',
+                                  style: typography.caption.copyWith(
+                                    color: colors.textMuted,
+                                  ),
+                                ),
                                 Text(
                                   round!.word!.text.toUpperCase(),
-                                  style: typography.body.copyWith(color: colors.primary, fontWeight: FontWeight.bold),
+                                  style: typography.body.copyWith(
+                                    color: colors.primary,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ],
                             ),
@@ -154,10 +175,20 @@ class _LANGamePageState extends ConsumerState<LANGamePage> {
                             Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Text('DRAWER', style: typography.caption.copyWith(color: colors.textMuted)),
                                 Text(
-                                  round!.drawerSlotId == 'host' ? 'Host' : 'Peer',
-                                  style: typography.body.copyWith(color: colors.secondary, fontWeight: FontWeight.bold),
+                                  'DRAWER',
+                                  style: typography.caption.copyWith(
+                                    color: colors.textMuted,
+                                  ),
+                                ),
+                                Text(
+                                  round!.drawerSlotId == 'host'
+                                      ? 'Host'
+                                      : 'Peer',
+                                  style: typography.body.copyWith(
+                                    color: colors.secondary,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ],
                             ),
@@ -168,7 +199,8 @@ class _LANGamePageState extends ConsumerState<LANGamePage> {
                 ),
                 SWGameTimer(
                   seconds: seconds.clamp(0, 300),
-                  maxSeconds: round?.timerState?.durationSecs.clamp(1, 300) ?? 60,
+                  maxSeconds:
+                      round?.timerState?.durationSecs.clamp(1, 300) ?? 60,
                 ),
               ],
             ),
@@ -196,12 +228,15 @@ class _LANGamePageState extends ConsumerState<LANGamePage> {
                     Expanded(
                       child: TextField(
                         controller: _guessController,
-                        onSubmitted: (_) => _submitGuess(notifier, localPlayerId),
+                        onSubmitted: (_) =>
+                            _submitGuess(notifier, localPlayerId),
                         decoration: InputDecoration(
                           hintText: 'Type your guess here...',
                           filled: true,
                           fillColor: colors.surface,
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.r)),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8.r),
+                          ),
                         ),
                       ),
                     ),
@@ -222,7 +257,12 @@ class _LANGamePageState extends ConsumerState<LANGamePage> {
           // Word Selection Overlay
           if (state is WordSelectionState && isLocalDrawer)
             Positioned.fill(
-              child: _buildWordSelectionOverlay(context, session, notifier, localPlayerId),
+              child: _buildWordSelectionOverlay(
+                context,
+                session,
+                notifier,
+                localPlayerId,
+              ),
             ),
 
           if (state is WordSelectionState && !isLocalDrawer)
@@ -237,7 +277,9 @@ class _LANGamePageState extends ConsumerState<LANGamePage> {
                       SizedBox(height: spacing.md),
                       Text(
                         'Drawer is choosing a word...',
-                        style: typography.heading.copyWith(color: colors.textMuted),
+                        style: typography.heading.copyWith(
+                          color: colors.textMuted,
+                        ),
                       ),
                     ],
                   ),
@@ -247,15 +289,11 @@ class _LANGamePageState extends ConsumerState<LANGamePage> {
 
           // Scoreboard Overlay
           if (state is RoundFinishedState || state is ScoreboardState)
-            Positioned.fill(
-              child: _buildScoreboardOverlay(context, match),
-            ),
+            Positioned.fill(child: _buildScoreboardOverlay(context, match)),
 
           // Pause Overlay Dialog
           if (_showPauseDialog)
-            Positioned.fill(
-              child: _buildPauseOverlay(context, notifier),
-            ),
+            Positioned.fill(child: _buildPauseOverlay(context, notifier)),
         ],
       ),
     );
@@ -275,10 +313,14 @@ class _LANGamePageState extends ConsumerState<LANGamePage> {
           Row(
             children: [
               IconButton.filled(
-                icon: Icon(_isMoveMode ? Icons.pan_tool_rounded : Icons.brush_rounded),
+                icon: Icon(
+                  _isMoveMode ? Icons.pan_tool_rounded : Icons.brush_rounded,
+                ),
                 onPressed: () => setState(() => _isMoveMode = !_isMoveMode),
                 style: IconButton.styleFrom(
-                  backgroundColor: _isMoveMode ? colors.secondary : colors.primary,
+                  backgroundColor: _isMoveMode
+                      ? colors.secondary
+                      : colors.primary,
                   foregroundColor: Colors.white,
                 ),
               ),
@@ -286,7 +328,11 @@ class _LANGamePageState extends ConsumerState<LANGamePage> {
               Expanded(
                 child: Row(
                   children: [
-                    Icon(Icons.line_weight_rounded, color: colors.textMuted, size: 16.r),
+                    Icon(
+                      Icons.line_weight_rounded,
+                      color: colors.textMuted,
+                      size: 16.r,
+                    ),
                     Expanded(
                       child: Slider(
                         value: _brushSize,
@@ -310,7 +356,9 @@ class _LANGamePageState extends ConsumerState<LANGamePage> {
                 onPressed: canvasController.state.canUndo
                     ? () {
                         canvasController.undo();
-                        notifier.controller.sendDrawingEvent(const UndoPerformed());
+                        notifier.controller.sendDrawingEvent(
+                          const UndoPerformed(),
+                        );
                       }
                     : null,
                 color: colors.primary,
@@ -320,7 +368,9 @@ class _LANGamePageState extends ConsumerState<LANGamePage> {
                 onPressed: canvasController.state.strokes.isNotEmpty
                     ? () {
                         canvasController.clear();
-                        notifier.controller.sendDrawingEvent(const CanvasCleared());
+                        notifier.controller.sendDrawingEvent(
+                          const CanvasCleared(),
+                        );
                       }
                     : null,
                 color: colors.danger,
@@ -376,7 +426,11 @@ class _LANGamePageState extends ConsumerState<LANGamePage> {
   }
 
   Widget _buildWordSelectionOverlay(
-      BuildContext context, LANSession session, LANSessionState notifier, String localPlayerId) {
+    BuildContext context,
+    LANSession session,
+    LANSessionState notifier,
+    String localPlayerId,
+  ) {
     final spacing = context.swSpacing;
     final colors = context.swColors;
     final typography = context.swTypography;
@@ -395,14 +449,17 @@ class _LANGamePageState extends ConsumerState<LANGamePage> {
                 Text(
                   'CHOOSE A WORD TO DRAW',
                   textAlign: TextAlign.center,
-                  style: typography.heading.copyWith(fontWeight: FontWeight.w900),
+                  style: typography.heading.copyWith(
+                    fontWeight: FontWeight.w900,
+                  ),
                 ),
                 SizedBox(height: spacing.lg),
                 ...options.map((w) {
                   return Padding(
                     padding: EdgeInsets.only(bottom: spacing.md.r),
                     child: InkWell(
-                      onTap: () => notifier.controller.chooseWord(w, localPlayerId),
+                      onTap: () =>
+                          notifier.controller.chooseWord(w, localPlayerId),
                       child: Container(
                         padding: EdgeInsets.all(spacing.md.r),
                         decoration: BoxDecoration(
@@ -413,10 +470,20 @@ class _LANGamePageState extends ConsumerState<LANGamePage> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(w.text.toUpperCase(),
-                                style: typography.body.copyWith(fontWeight: FontWeight.bold, color: colors.primary)),
-                            Text(w.difficulty.name.toUpperCase(),
-                                style: typography.caption.copyWith(color: colors.secondary, fontWeight: FontWeight.bold)),
+                            Text(
+                              w.text.toUpperCase(),
+                              style: typography.body.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: colors.primary,
+                              ),
+                            ),
+                            Text(
+                              w.difficulty.name.toUpperCase(),
+                              style: typography.caption.copyWith(
+                                color: colors.secondary,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -434,7 +501,8 @@ class _LANGamePageState extends ConsumerState<LANGamePage> {
   Widget _buildScoreboardOverlay(BuildContext context, gameplay.Match match) {
     final spacing = context.swSpacing;
     final typography = context.swTypography;
-    final players = match.players.toList()..sort((a, b) => b.totalScore.compareTo(a.totalScore));
+    final players = match.players.toList()
+      ..sort((a, b) => b.totalScore.compareTo(a.totalScore));
 
     return Container(
       color: Colors.black87,
@@ -449,7 +517,9 @@ class _LANGamePageState extends ConsumerState<LANGamePage> {
                 Text(
                   'ROUND SCOREBOARD',
                   textAlign: TextAlign.center,
-                  style: typography.heading.copyWith(fontWeight: FontWeight.w900),
+                  style: typography.heading.copyWith(
+                    fontWeight: FontWeight.w900,
+                  ),
                 ),
                 SizedBox(height: spacing.lg),
                 ...players.map((p) {
@@ -458,8 +528,18 @@ class _LANGamePageState extends ConsumerState<LANGamePage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(p.displayName, style: typography.body.copyWith(fontWeight: FontWeight.bold)),
-                        Text('${p.totalScore} pts', style: typography.body.copyWith(fontWeight: FontWeight.bold)),
+                        Text(
+                          p.displayName,
+                          style: typography.body.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          '${p.totalScore} pts',
+                          style: typography.body.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ],
                     ),
                   );
@@ -486,7 +566,11 @@ class _LANGamePageState extends ConsumerState<LANGamePage> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text('MATCH PAUSED', textAlign: TextAlign.center, style: typography.heading),
+                Text(
+                  'MATCH PAUSED',
+                  textAlign: TextAlign.center,
+                  style: typography.heading,
+                ),
                 SizedBox(height: spacing.md),
                 SWButton(
                   text: 'Resume Match',

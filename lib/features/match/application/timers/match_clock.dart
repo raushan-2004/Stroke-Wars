@@ -20,10 +20,7 @@ enum MatchClockType {
 
 /// Immutable snapshot representing the unified state of the [MatchClock].
 class MatchClockState {
-  const MatchClockState({
-    required this.type,
-    required this.timerState,
-  });
+  const MatchClockState({required this.type, required this.timerState});
 
   /// The active phase of the clock.
   final MatchClockType type;
@@ -41,7 +38,8 @@ class MatchClockState {
   double get progress => timerState.progress;
 
   @override
-  String toString() => 'MatchClockState(type: ${type.name}, progress: $progress)';
+  String toString() =>
+      'MatchClockState(type: ${type.name}, progress: $progress)';
 }
 
 /// A unified clock timer manager for a Stroke Wars match.

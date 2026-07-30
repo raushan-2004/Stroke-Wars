@@ -24,7 +24,8 @@ class DefaultRandomProvider implements RandomProvider {
   /// Creates a [DefaultRandomProvider].
   ///
   /// If [seed] is non-null the sequence will be deterministic.
-  DefaultRandomProvider([int? seed]) : _random = seed != null ? Random(seed) : Random.secure();
+  DefaultRandomProvider([int? seed])
+    : _random = seed != null ? Random(seed) : Random.secure();
 
   final Random _random;
 

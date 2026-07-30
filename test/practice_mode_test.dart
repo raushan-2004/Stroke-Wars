@@ -62,65 +62,86 @@ void main() {
       renderQueue = RenderQueue();
       drawingBus = DrawingEventBus();
       drawingDispatcher = DrawingEventDispatcher(eventBus: drawingBus);
-      canvasController = CanvasController(renderQueue: renderQueue, dispatcher: drawingDispatcher);
+      canvasController = CanvasController(
+        renderQueue: renderQueue,
+        dispatcher: drawingDispatcher,
+      );
       testClock = TestClock(DateTime(2026, 7, 29, 12, 0, 0));
     });
 
-    test('PracticeConfiguration holds default values and JSON serialization', () {
-      const config = PracticeConfiguration();
-      expect(config.rounds, 3);
-      expect(config.botCount, 2);
-      expect(config.drawTimeSecs, 60);
+    test(
+      'PracticeConfiguration holds default values and JSON serialization',
+      () {
+        const config = PracticeConfiguration();
+        expect(config.rounds, 3);
+        expect(config.botCount, 2);
+        expect(config.drawTimeSecs, 60);
 
-      final jsonMap = config.toJson();
-      final restored = PracticeConfiguration.fromJson(jsonMap);
-      expect(restored.rounds, 3);
-      expect(restored.botCount, 2);
-    });
+        final jsonMap = config.toJson();
+        final restored = PracticeConfiguration.fromJson(jsonMap);
+        expect(restored.rounds, 3);
+        expect(restored.botCount, 2);
+      },
+    );
 
-    test('PracticeStatisticsCollector tracks drawings, undo/redo, time ticks', () {
-      const collector = PracticeStatisticsCollector();
-      var stats = const PracticeStatistics();
+    test(
+      'PracticeStatisticsCollector tracks drawings, undo/redo, time ticks',
+      () {
+        const collector = PracticeStatisticsCollector();
+        var stats = const PracticeStatistics();
 
-      // Start stroke
-      stats = collector.processDrawingEvent(
-        stats,
-        StrokeStarted(
-          strokeId: 's1',
-          playerId: 'human-1',
-          brushId: 'classic',
-          color: '#ffffff',
-          width: 8,
-          opacity: 1,
-          timestamp: DateTime(2026, 7, 29),
-        ),
-      );
-      expect(stats.strokeCount, 1);
-      expect(stats.brushUsage['classic'], 1);
+        // Start stroke
+        stats = collector.processDrawingEvent(
+          stats,
+          StrokeStarted(
+            strokeId: 's1',
+            playerId: 'human-1',
+            brushId: 'classic',
+            color: '#ffffff',
+            width: 8,
+            opacity: 1,
+            timestamp: DateTime(2026, 7, 29),
+          ),
+        );
+        expect(stats.strokeCount, 1);
+        expect(stats.brushUsage['classic'], 1);
 
-      // Add points
-      stats = collector.processDrawingEvent(stats, const PointAdded(strokeId: 's1', point: StrokePoint(x: 0, y: 0, timestamp: 0)));
-      stats = collector.processDrawingEvent(stats, const PointAdded(strokeId: 's1', point: StrokePoint(x: 0, y: 0, timestamp: 0)));
-      expect(stats.averageStrokeLength, 2.0);
+        // Add points
+        stats = collector.processDrawingEvent(
+          stats,
+          const PointAdded(
+            strokeId: 's1',
+            point: StrokePoint(x: 0, y: 0, timestamp: 0),
+          ),
+        );
+        stats = collector.processDrawingEvent(
+          stats,
+          const PointAdded(
+            strokeId: 's1',
+            point: StrokePoint(x: 0, y: 0, timestamp: 0),
+          ),
+        );
+        expect(stats.averageStrokeLength, 2.0);
 
-      // Undo/Redo
-      stats = collector.processDrawingEvent(stats, const UndoPerformed());
-      expect(stats.undoCount, 1);
+        // Undo/Redo
+        stats = collector.processDrawingEvent(stats, const UndoPerformed());
+        expect(stats.undoCount, 1);
 
-      stats = collector.processDrawingEvent(stats, const RedoPerformed());
-      expect(stats.redoCount, 1);
+        stats = collector.processDrawingEvent(stats, const RedoPerformed());
+        expect(stats.redoCount, 1);
 
-      // Time ticks
-      stats = collector.processTimeTick(stats, 5.0, true); // drawing
-      stats = collector.processTimeTick(stats, 10.0, false); // idle
-      expect(stats.drawingDuration, 5.0);
-      expect(stats.idleDuration, 10.0);
+        // Time ticks
+        stats = collector.processTimeTick(stats, 5.0, true); // drawing
+        stats = collector.processTimeTick(stats, 10.0, false); // idle
+        expect(stats.drawingDuration, 5.0);
+        expect(stats.idleDuration, 10.0);
 
-      // Round completion
-      stats = collector.processRoundCompletion(stats, 30);
-      expect(stats.totalRoundsCompleted, 1);
-      expect(stats.averageRoundDuration, 30.0);
-    });
+        // Round completion
+        stats = collector.processRoundCompletion(stats, 30);
+        expect(stats.totalRoundsCompleted, 1);
+        expect(stats.averageRoundDuration, 30.0);
+      },
+    );
 
     test('PracticeReplayRecorder records MatchEvents and DrawingEvents', () {
       final recorder = PracticeReplayRecorder();
@@ -155,103 +176,109 @@ void main() {
       expect(correctGuesses, isNotEmpty);
     });
 
-    test('PracticeSessionCoordinator handles lifecycle start, choice, timers, and autosave', () async {
-      var updatedCount = 0;
-      var autosaveCount = 0;
-      late PracticeSession latestSession;
+    test(
+      'PracticeSessionCoordinator handles lifecycle start, choice, timers, and autosave',
+      () async {
+        var updatedCount = 0;
+        var autosaveCount = 0;
+        late PracticeSession latestSession;
 
-      final config = const PracticeConfiguration(
-        rounds: 2,
-        botCount: 1,
-        drawTimeSecs: 40,
-        scoreboardTimeSecs: 5,
-        autosaveEnabled: true,
-      );
+        final config = const PracticeConfiguration(
+          rounds: 2,
+          botCount: 1,
+          drawTimeSecs: 40,
+          scoreboardTimeSecs: 5,
+          autosaveEnabled: true,
+        );
 
-      final coordinator = PracticeSessionCoordinator(
-        canvasController: canvasController,
-        drawingBus: drawingBus,
-        humanPlayerId: 'human-1',
-        humanDisplayName: 'Bob',
-        configuration: config,
-        clock: testClock,
-        onSessionUpdated: (session) {
-          updatedCount++;
-          latestSession = session;
-        },
-        onAutosaveTriggered: (session) {
-          autosaveCount++;
-        },
-      );
+        final coordinator = PracticeSessionCoordinator(
+          canvasController: canvasController,
+          drawingBus: drawingBus,
+          humanPlayerId: 'human-1',
+          humanDisplayName: 'Bob',
+          configuration: config,
+          clock: testClock,
+          onSessionUpdated: (session) {
+            updatedCount++;
+            latestSession = session;
+          },
+          onAutosaveTriggered: (session) {
+            autosaveCount++;
+          },
+        );
 
-      // Start match
-      await coordinator.start();
-      expect(latestSession.currentMatch.state, isA<WordSelectionState>());
-      expect(latestSession.currentRound, isNotNull);
-      expect(latestSession.currentRound!.wordOptions, isNotEmpty);
+        // Start match
+        await coordinator.start();
+        expect(latestSession.currentMatch.state, isA<WordSelectionState>());
+        expect(latestSession.currentRound, isNotNull);
+        expect(latestSession.currentRound!.wordOptions, isNotEmpty);
 
-      // Human chooses word
-      final chosenWord = latestSession.currentRound!.wordOptions.first;
-      await coordinator.chooseWord(chosenWord);
+        // Human chooses word
+        final chosenWord = latestSession.currentRound!.wordOptions.first;
+        await coordinator.chooseWord(chosenWord);
 
-      expect(latestSession.currentMatch.state, isA<DrawingState>());
-      expect(latestSession.currentWord!.text, chosenWord.text);
+        expect(latestSession.currentMatch.state, isA<DrawingState>());
+        expect(latestSession.currentWord!.text, chosenWord.text);
 
-      // End round
-      await coordinator.endRound();
-      expect(latestSession.currentMatch.state, isA<RoundFinishedState>());
-      expect(autosaveCount, greaterThan(0));
+        // End round
+        await coordinator.endRound();
+        expect(latestSession.currentMatch.state, isA<RoundFinishedState>());
+        expect(autosaveCount, greaterThan(0));
 
-      coordinator.dispose();
-    });
+        coordinator.dispose();
+      },
+    );
 
-    test('PracticeModeController pause, resume, and autosave recovery works', () async {
-      final controller = PracticeModeController(
-        storage: storage,
-        canvasController: canvasController,
-        drawingBus: drawingBus,
-        humanPlayerId: 'human-1',
-        humanDisplayName: 'Bob',
-        clock: testClock,
-      );
+    test(
+      'PracticeModeController pause, resume, and autosave recovery works',
+      () async {
+        final controller = PracticeModeController(
+          storage: storage,
+          canvasController: canvasController,
+          drawingBus: drawingBus,
+          humanPlayerId: 'human-1',
+          humanDisplayName: 'Bob',
+          clock: testClock,
+        );
 
-      final config = const PracticeConfiguration(
-        rounds: 3,
-        botCount: 2,
-        autosaveEnabled: true,
-      );
+        final config = const PracticeConfiguration(
+          rounds: 3,
+          botCount: 2,
+          autosaveEnabled: true,
+        );
 
-      // Start
-      await controller.startPractice(config);
-      expect(controller.session, isNotNull);
+        // Start
+        await controller.startPractice(config);
+        expect(controller.session, isNotNull);
 
-      // Pause
-      controller.pausePractice();
-      expect(controller.session!.practiceStatistics.pauseCount, 1);
-      
-      // Verify autosave entry exists in storage
-      expect(storage.containsKey('active_practice_session'), true);
+        // Pause
+        controller.pausePractice();
+        expect(controller.session!.practiceStatistics.pauseCount, 1);
 
-      // Resume
-      controller.resumePractice();
+        // Verify autosave entry exists in storage
+        expect(storage.containsKey('active_practice_session'), true);
 
-      // Recover session in a new controller
-      final controller2 = PracticeModeController(
-        storage: storage,
-        canvasController: canvasController,
-        drawingBus: drawingBus,
-        humanPlayerId: 'human-1',
-        humanDisplayName: 'Bob',
-        clock: testClock,
-      );
+        // Resume
+        controller.resumePractice();
 
-      final recovered = controller2.loadSavedSession();
-      expect(recovered, true);
-      expect(controller2.session!.configuration.rounds, 3);
+        // Recover session in a new controller
+        final controller2 = PracticeModeController(
+          storage: storage,
+          canvasController: canvasController,
+          drawingBus: drawingBus,
+          humanPlayerId: 'human-1',
+          humanDisplayName: 'Bob',
+          clock: testClock,
+        );
 
-      await controller.quitPractice();
-      controller.dispose();
-      controller2.dispose();
-    });
+        final recovered = controller2.loadSavedSession();
+        expect(recovered, true);
+        expect(controller2.session!.configuration.rounds, 3);
+
+        await controller.quitPractice();
+        controller.dispose();
+        controller2.dispose();
+      },
+    );
   });
 }

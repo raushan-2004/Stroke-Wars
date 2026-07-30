@@ -18,7 +18,10 @@ sealed class NetworkMessage {
 
 /// Client handshake request verifying protocol and engine compatibility.
 class VersionMessage extends NetworkMessage {
-  const VersionMessage({required this.protocolVersion, required this.engineVersion});
+  const VersionMessage({
+    required this.protocolVersion,
+    required this.engineVersion,
+  });
 
   final int protocolVersion;
   final String engineVersion;
@@ -28,14 +31,14 @@ class VersionMessage extends NetworkMessage {
 
   @override
   Map<String, dynamic> toJson() => {
-        'protocolVersion': protocolVersion,
-        'engineVersion': engineVersion,
-      };
+    'protocolVersion': protocolVersion,
+    'engineVersion': engineVersion,
+  };
 
   factory VersionMessage.fromJson(Map<String, dynamic> json) => VersionMessage(
-        protocolVersion: json['protocolVersion'] as int,
-        engineVersion: json['engineVersion'] as String,
-      );
+    protocolVersion: json['protocolVersion'] as int,
+    engineVersion: json['engineVersion'] as String,
+  );
 }
 
 /// Client request payload to join a multiplayer room lobby.
@@ -48,11 +51,10 @@ class JoinRoomMessage extends NetworkMessage {
   String get type => 'join_room';
 
   @override
-  Map<String, dynamic> toJson() => {
-        'peerInfo': peerInfo.toJson(),
-      };
+  Map<String, dynamic> toJson() => {'peerInfo': peerInfo.toJson()};
 
-  factory JoinRoomMessage.fromJson(Map<String, dynamic> json) => JoinRoomMessage(
+  factory JoinRoomMessage.fromJson(Map<String, dynamic> json) =>
+      JoinRoomMessage(
         peerInfo: PeerInfo.fromJson(json['peerInfo'] as Map<String, dynamic>),
       );
 }
@@ -68,12 +70,10 @@ class LeaveRoomMessage extends NetworkMessage {
   String get type => 'leave_room';
 
   @override
-  Map<String, dynamic> toJson() => {
-        'peerId': peerId,
-        'reason': reason,
-      };
+  Map<String, dynamic> toJson() => {'peerId': peerId, 'reason': reason};
 
-  factory LeaveRoomMessage.fromJson(Map<String, dynamic> json) => LeaveRoomMessage(
+  factory LeaveRoomMessage.fromJson(Map<String, dynamic> json) =>
+      LeaveRoomMessage(
         peerId: json['peerId'] as String,
         reason: json['reason'] as String,
       );
@@ -90,15 +90,12 @@ class ReadyMessage extends NetworkMessage {
   String get type => 'ready';
 
   @override
-  Map<String, dynamic> toJson() => {
-        'peerId': peerId,
-        'isReady': isReady,
-      };
+  Map<String, dynamic> toJson() => {'peerId': peerId, 'isReady': isReady};
 
   factory ReadyMessage.fromJson(Map<String, dynamic> json) => ReadyMessage(
-        peerId: json['peerId'] as String,
-        isReady: json['isReady'] as bool,
-      );
+    peerId: json['peerId'] as String,
+    isReady: json['isReady'] as bool,
+  );
 }
 
 /// Client request sending a match command to the authoritative host.
@@ -120,7 +117,8 @@ class MatchCommandMessage extends NetworkMessage {
     };
   }
 
-  factory MatchCommandMessage.fromJson(Map<String, dynamic> json) => MatchCommandMessage(
+  factory MatchCommandMessage.fromJson(Map<String, dynamic> json) =>
+      MatchCommandMessage(
         command: _deserializeCommand(
           json['commandType'] as String,
           json['commandData'] as Map<String, dynamic>,
@@ -138,11 +136,10 @@ class MatchEventMessage extends NetworkMessage {
   String get type => 'match_event';
 
   @override
-  Map<String, dynamic> toJson() => {
-        'event': event.toJson(),
-      };
+  Map<String, dynamic> toJson() => {'event': event.toJson()};
 
-  factory MatchEventMessage.fromJson(Map<String, dynamic> json) => MatchEventMessage(
+  factory MatchEventMessage.fromJson(Map<String, dynamic> json) =>
+      MatchEventMessage(
         event: MatchEvent.fromJson(json['event'] as Map<String, dynamic>),
       );
 }
@@ -157,11 +154,10 @@ class CanvasEventMessage extends NetworkMessage {
   String get type => 'canvas_event';
 
   @override
-  Map<String, dynamic> toJson() => {
-        'event': event.toJson(),
-      };
+  Map<String, dynamic> toJson() => {'event': event.toJson()};
 
-  factory CanvasEventMessage.fromJson(Map<String, dynamic> json) => CanvasEventMessage(
+  factory CanvasEventMessage.fromJson(Map<String, dynamic> json) =>
+      CanvasEventMessage(
         event: DrawingEvent.fromJson(json['event'] as Map<String, dynamic>),
       );
 }
@@ -176,13 +172,10 @@ class HeartbeatMessage extends NetworkMessage {
   String get type => 'heartbeat';
 
   @override
-  Map<String, dynamic> toJson() => {
-        'sentAt': sentAt.toIso8601String(),
-      };
+  Map<String, dynamic> toJson() => {'sentAt': sentAt.toIso8601String()};
 
-  factory HeartbeatMessage.fromJson(Map<String, dynamic> json) => HeartbeatMessage(
-        sentAt: DateTime.parse(json['sentAt'] as String),
-      );
+  factory HeartbeatMessage.fromJson(Map<String, dynamic> json) =>
+      HeartbeatMessage(sentAt: DateTime.parse(json['sentAt'] as String));
 }
 
 /// Latency measuring Ping request.
@@ -195,13 +188,10 @@ class PingMessage extends NetworkMessage {
   String get type => 'ping';
 
   @override
-  Map<String, dynamic> toJson() => {
-        'sentAt': sentAt.toIso8601String(),
-      };
+  Map<String, dynamic> toJson() => {'sentAt': sentAt.toIso8601String()};
 
-  factory PingMessage.fromJson(Map<String, dynamic> json) => PingMessage(
-        sentAt: DateTime.parse(json['sentAt'] as String),
-      );
+  factory PingMessage.fromJson(Map<String, dynamic> json) =>
+      PingMessage(sentAt: DateTime.parse(json['sentAt'] as String));
 }
 
 /// Latency measuring Pong response.
@@ -216,14 +206,14 @@ class PongMessage extends NetworkMessage {
 
   @override
   Map<String, dynamic> toJson() => {
-        'pingSentAt': pingSentAt.toIso8601String(),
-        'sentAt': sentAt.toIso8601String(),
-      };
+    'pingSentAt': pingSentAt.toIso8601String(),
+    'sentAt': sentAt.toIso8601String(),
+  };
 
   factory PongMessage.fromJson(Map<String, dynamic> json) => PongMessage(
-        pingSentAt: DateTime.parse(json['pingSentAt'] as String),
-        sentAt: DateTime.parse(json['sentAt'] as String),
-      );
+    pingSentAt: DateTime.parse(json['pingSentAt'] as String),
+    sentAt: DateTime.parse(json['sentAt'] as String),
+  );
 }
 
 /// Full state snapshot payload used for reconnect and initial sync operations.
@@ -236,12 +226,13 @@ class SnapshotMessage extends NetworkMessage {
   String get type => 'snapshot';
 
   @override
-  Map<String, dynamic> toJson() => {
-        'snapshot': snapshot.toJson(),
-      };
+  Map<String, dynamic> toJson() => {'snapshot': snapshot.toJson()};
 
-  factory SnapshotMessage.fromJson(Map<String, dynamic> json) => SnapshotMessage(
-        snapshot: RoomSnapshot.fromJson(json['snapshot'] as Map<String, dynamic>),
+  factory SnapshotMessage.fromJson(Map<String, dynamic> json) =>
+      SnapshotMessage(
+        snapshot: RoomSnapshot.fromJson(
+          json['snapshot'] as Map<String, dynamic>,
+        ),
       );
 }
 
@@ -256,15 +247,12 @@ class ErrorMessage extends NetworkMessage {
   String get type => 'error';
 
   @override
-  Map<String, dynamic> toJson() => {
-        'code': code,
-        'message': message,
-      };
+  Map<String, dynamic> toJson() => {'code': code, 'message': message};
 
   factory ErrorMessage.fromJson(Map<String, dynamic> json) => ErrorMessage(
-        code: json['code'] as String,
-        message: json['message'] as String,
-      );
+    code: json['code'] as String,
+    message: json['message'] as String,
+  );
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -291,15 +279,9 @@ Map<String, dynamic> _serializeCommand(MatchCommand cmd) {
       'isReady': cmd.isReady,
     };
   } else if (cmd is StartMatchCommand) {
-    return {
-      'matchId': cmd.matchId.value,
-      'hostId': cmd.hostId,
-    };
+    return {'matchId': cmd.matchId.value, 'hostId': cmd.hostId};
   } else if (cmd is LeaveMatchCommand) {
-    return {
-      'matchId': cmd.matchId.value,
-      'playerId': cmd.playerId,
-    };
+    return {'matchId': cmd.matchId.value, 'playerId': cmd.playerId};
   }
   return {};
 }

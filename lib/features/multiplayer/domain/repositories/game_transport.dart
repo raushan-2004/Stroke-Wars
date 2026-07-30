@@ -1,19 +1,11 @@
 import 'dart:async';
 
 /// Connection state of the raw underlying game transport.
-enum TransportConnectionState {
-  disconnected,
-  connecting,
-  connected,
-  failed,
-}
+enum TransportConnectionState { disconnected, connecting, connected, failed }
 
 /// A wrapper for received transport messages.
 class TransportMessage {
-  const TransportMessage({
-    required this.senderId,
-    required this.content,
-  });
+  const TransportMessage({required this.senderId, required this.content});
 
   /// Identifier of the sender peer.
   final String senderId;

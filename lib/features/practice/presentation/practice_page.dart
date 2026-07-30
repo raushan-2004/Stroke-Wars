@@ -45,7 +45,10 @@ class _PracticePageState extends ConsumerState<PracticePage> {
     super.initState();
     // Try to load any previously auto-saved session when opening the page
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final hasSaved = ref.read(practiceSessionStateProvider.notifier).controller.loadSavedSession();
+      final hasSaved = ref
+          .read(practiceSessionStateProvider.notifier)
+          .controller
+          .loadSavedSession();
       if (hasSaved) {
         SWToast.show(context, 'Recovered auto-saved practice session.');
       }
@@ -122,9 +125,7 @@ class _PracticePageState extends ConsumerState<PracticePage> {
 
           // Scoreboard Overlay (RoundFinished / ScoreboardState)
           if (state is RoundFinishedState)
-            Positioned.fill(
-              child: _buildScoreboardOverlay(context, session),
-            ),
+            Positioned.fill(child: _buildScoreboardOverlay(context, session)),
 
           // Bottom Toolbar (Only active during drawing/guessing phases)
           if (state is DrawingState || state is GuessingState)
@@ -137,9 +138,7 @@ class _PracticePageState extends ConsumerState<PracticePage> {
 
           // Pause Overlay Dialog
           if (_showPauseDialog)
-            Positioned.fill(
-              child: _buildPauseOverlay(context, notifier),
-            ),
+            Positioned.fill(child: _buildPauseOverlay(context, notifier)),
         ],
       ),
     );
@@ -149,12 +148,17 @@ class _PracticePageState extends ConsumerState<PracticePage> {
   // Pre-match Lobby Setup UI
   // ───────────────────────────────────────────────────────────────────────────
 
-  Widget _buildLobbyScreen(BuildContext context, PracticeSessionState notifier) {
+  Widget _buildLobbyScreen(
+    BuildContext context,
+    PracticeSessionState notifier,
+  ) {
     final colors = context.swColors;
     final spacing = context.swSpacing;
     final typography = context.swTypography;
 
-    final hasSavedSession = notifier.controller.storage.containsKey('active_practice_session');
+    final hasSavedSession = notifier.controller.storage.containsKey(
+      'active_practice_session',
+    );
 
     return AppScaffold(
       useSafeArea: true,
@@ -197,12 +201,18 @@ class _PracticePageState extends ConsumerState<PracticePage> {
                         DropdownButton<int>(
                           value: _rounds,
                           dropdownColor: colors.surfaceContainer,
-                          style: typography.body.copyWith(color: colors.textPrimary),
-                          onChanged: (val) => setState(() => _rounds = val ?? 3),
+                          style: typography.body.copyWith(
+                            color: colors.textPrimary,
+                          ),
+                          onChanged: (val) =>
+                              setState(() => _rounds = val ?? 3),
                           items: const [
                             DropdownMenuItem(value: 3, child: Text('3 Rounds')),
                             DropdownMenuItem(value: 5, child: Text('5 Rounds')),
-                            DropdownMenuItem(value: 10, child: Text('10 Rounds')),
+                            DropdownMenuItem(
+                              value: 10,
+                              child: Text('10 Rounds'),
+                            ),
                           ],
                         ),
                       ],
@@ -217,8 +227,11 @@ class _PracticePageState extends ConsumerState<PracticePage> {
                         DropdownButton<int>(
                           value: _botCount,
                           dropdownColor: colors.surfaceContainer,
-                          style: typography.body.copyWith(color: colors.textPrimary),
-                          onChanged: (val) => setState(() => _botCount = val ?? 2),
+                          style: typography.body.copyWith(
+                            color: colors.textPrimary,
+                          ),
+                          onChanged: (val) =>
+                              setState(() => _botCount = val ?? 2),
                           items: const [
                             DropdownMenuItem(value: 1, child: Text('1 Bot')),
                             DropdownMenuItem(value: 2, child: Text('2 Bots')),
@@ -237,10 +250,19 @@ class _PracticePageState extends ConsumerState<PracticePage> {
                         DropdownButton<WordDifficulty>(
                           value: _difficulty,
                           dropdownColor: colors.surfaceContainer,
-                          style: typography.body.copyWith(color: colors.textPrimary),
-                          onChanged: (val) => setState(() => _difficulty = val ?? WordDifficulty.easy),
+                          style: typography.body.copyWith(
+                            color: colors.textPrimary,
+                          ),
+                          onChanged: (val) => setState(
+                            () => _difficulty = val ?? WordDifficulty.easy,
+                          ),
                           items: WordDifficulty.values
-                              .map((d) => DropdownMenuItem(value: d, child: Text(d.name.toUpperCase())))
+                              .map(
+                                (d) => DropdownMenuItem(
+                                  value: d,
+                                  child: Text(d.name.toUpperCase()),
+                                ),
+                              )
                               .toList(),
                         ),
                       ],
@@ -255,10 +277,19 @@ class _PracticePageState extends ConsumerState<PracticePage> {
                         DropdownButton<WordCategory>(
                           value: _category,
                           dropdownColor: colors.surfaceContainer,
-                          style: typography.body.copyWith(color: colors.textPrimary),
-                          onChanged: (val) => setState(() => _category = val ?? WordCategory.animals),
+                          style: typography.body.copyWith(
+                            color: colors.textPrimary,
+                          ),
+                          onChanged: (val) => setState(
+                            () => _category = val ?? WordCategory.animals,
+                          ),
                           items: WordCategory.values
-                              .map((c) => DropdownMenuItem(value: c, child: Text(c.name.toUpperCase())))
+                              .map(
+                                (c) => DropdownMenuItem(
+                                  value: c,
+                                  child: Text(c.name.toUpperCase()),
+                                ),
+                              )
                               .toList(),
                         ),
                       ],
@@ -274,7 +305,10 @@ class _PracticePageState extends ConsumerState<PracticePage> {
                   onPressed: () {
                     final success = notifier.controller.loadSavedSession();
                     if (!success) {
-                      SWToast.show(context, 'Failed to restore session. Starting new.');
+                      SWToast.show(
+                        context,
+                        'Failed to restore session. Starting new.',
+                      );
                     }
                   },
                   variant: SWButtonVariant.secondary,
@@ -325,7 +359,8 @@ class _PracticePageState extends ConsumerState<PracticePage> {
     final totalRounds = match.configuration.totalRounds;
 
     // Remaining seconds
-    final seconds = session.timerState.durationSecs - session.timerState.elapsedSecs;
+    final seconds =
+        session.timerState.durationSecs - session.timerState.elapsedSecs;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -335,7 +370,10 @@ class _PracticePageState extends ConsumerState<PracticePage> {
           icon: const Icon(Icons.pause_rounded),
           onPressed: () {
             setState(() => _showPauseDialog = true);
-            ref.read(practiceSessionStateProvider.notifier).controller.pausePractice();
+            ref
+                .read(practiceSessionStateProvider.notifier)
+                .controller
+                .pausePractice();
           },
           style: IconButton.styleFrom(
             backgroundColor: colors.surfaceContainer,
@@ -348,32 +386,64 @@ class _PracticePageState extends ConsumerState<PracticePage> {
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: spacing.md.r),
             child: SWGlassCard(
-              padding: EdgeInsets.symmetric(horizontal: spacing.md.r, vertical: spacing.xs.r),
+              padding: EdgeInsets.symmetric(
+                horizontal: spacing.md.r,
+                vertical: spacing.xs.r,
+              ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text('ROUND', style: typography.caption.copyWith(color: colors.textMuted)),
-                      Text('$currentRoundNum/$totalRounds', style: typography.body.copyWith(fontWeight: FontWeight.bold)),
+                      Text(
+                        'ROUND',
+                        style: typography.caption.copyWith(
+                          color: colors.textMuted,
+                        ),
+                      ),
+                      Text(
+                        '$currentRoundNum/$totalRounds',
+                        style: typography.body.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ],
                   ),
                   Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text('SCORE', style: typography.caption.copyWith(color: colors.textMuted)),
-                      Text('${session.score}', style: typography.body.copyWith(color: colors.secondary, fontWeight: FontWeight.bold)),
+                      Text(
+                        'SCORE',
+                        style: typography.caption.copyWith(
+                          color: colors.textMuted,
+                        ),
+                      ),
+                      Text(
+                        '${session.score}',
+                        style: typography.body.copyWith(
+                          color: colors.secondary,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ],
                   ),
                   if (session.currentWord != null)
                     Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text('DRAW WORD', style: typography.caption.copyWith(color: colors.textMuted)),
+                        Text(
+                          'DRAW WORD',
+                          style: typography.caption.copyWith(
+                            color: colors.textMuted,
+                          ),
+                        ),
                         Text(
                           session.currentWord!.text.toUpperCase(),
-                          style: typography.body.copyWith(color: colors.primary, fontWeight: FontWeight.bold),
+                          style: typography.body.copyWith(
+                            color: colors.primary,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ],
                     ),
@@ -396,7 +466,10 @@ class _PracticePageState extends ConsumerState<PracticePage> {
   // Bottom Brush Toolbar & Viewport Control
   // ───────────────────────────────────────────────────────────────────────────
 
-  Widget _buildBottomToolbar(BuildContext context, PracticeSessionState notifier) {
+  Widget _buildBottomToolbar(
+    BuildContext context,
+    PracticeSessionState notifier,
+  ) {
     final colors = context.swColors;
     final spacing = context.swSpacing;
     final typography = context.swTypography;
@@ -418,7 +491,9 @@ class _PracticePageState extends ConsumerState<PracticePage> {
                   setState(() => _isMoveMode = !_isMoveMode);
                 },
                 style: IconButton.styleFrom(
-                  backgroundColor: _isMoveMode ? colors.secondary : colors.primary,
+                  backgroundColor: _isMoveMode
+                      ? colors.secondary
+                      : colors.primary,
                   foregroundColor: Colors.white,
                 ),
               ),
@@ -428,7 +503,11 @@ class _PracticePageState extends ConsumerState<PracticePage> {
               Expanded(
                 child: Row(
                   children: [
-                    Icon(Icons.line_weight_rounded, color: colors.textMuted, size: 16.r),
+                    Icon(
+                      Icons.line_weight_rounded,
+                      color: colors.textMuted,
+                      size: 16.r,
+                    ),
                     Expanded(
                       child: Slider(
                         value: _brushSize,
@@ -451,17 +530,23 @@ class _PracticePageState extends ConsumerState<PracticePage> {
               // Undo / Redo
               IconButton(
                 icon: const Icon(Icons.undo_rounded),
-                onPressed: canvasController.state.canUndo ? () => canvasController.undo() : null,
+                onPressed: canvasController.state.canUndo
+                    ? () => canvasController.undo()
+                    : null,
                 color: colors.primary,
               ),
               IconButton(
                 icon: const Icon(Icons.redo_rounded),
-                onPressed: canvasController.state.canRedo ? () => canvasController.redo() : null,
+                onPressed: canvasController.state.canRedo
+                    ? () => canvasController.redo()
+                    : null,
                 color: colors.primary,
               ),
               IconButton(
                 icon: const Icon(Icons.delete_sweep_rounded),
-                onPressed: canvasController.state.strokes.isNotEmpty ? () => canvasController.clear() : null,
+                onPressed: canvasController.state.strokes.isNotEmpty
+                    ? () => canvasController.clear()
+                    : null,
                 color: colors.danger,
               ),
             ],
@@ -552,7 +637,10 @@ class _PracticePageState extends ConsumerState<PracticePage> {
   // ───────────────────────────────────────────────────────────────────────────
 
   Widget _buildWordSelectionOverlay(
-      BuildContext context, PracticeSession session, PracticeSessionState notifier) {
+    BuildContext context,
+    PracticeSession session,
+    PracticeSessionState notifier,
+  ) {
     final colors = context.swColors;
     final spacing = context.swSpacing;
     final typography = context.swTypography;
@@ -585,7 +673,10 @@ class _PracticePageState extends ConsumerState<PracticePage> {
                       onTap: () => notifier.controller.chooseWord(w),
                       borderRadius: BorderRadius.circular(8.r),
                       child: Container(
-                        padding: EdgeInsets.symmetric(horizontal: spacing.md.r, vertical: spacing.md.r),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: spacing.md.r,
+                          vertical: spacing.md.r,
+                        ),
                         decoration: BoxDecoration(
                           color: colors.surfaceContainer,
                           border: Border.all(color: colors.border),
@@ -596,17 +687,26 @@ class _PracticePageState extends ConsumerState<PracticePage> {
                           children: [
                             Text(
                               w.text.toUpperCase(),
-                              style: typography.body.copyWith(fontWeight: FontWeight.bold, color: colors.primary),
+                              style: typography.body.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: colors.primary,
+                              ),
                             ),
                             Container(
-                              padding: EdgeInsets.symmetric(horizontal: spacing.xs.r, vertical: spacing.xs.r),
+                              padding: EdgeInsets.symmetric(
+                                horizontal: spacing.xs.r,
+                                vertical: spacing.xs.r,
+                              ),
                               decoration: BoxDecoration(
                                 color: colors.secondary.withValues(alpha: 0.2),
                                 borderRadius: BorderRadius.circular(4.r),
                               ),
                               child: Text(
                                 w.difficulty.name.toUpperCase(),
-                                style: typography.caption.copyWith(color: colors.secondary, fontWeight: FontWeight.bold),
+                                style: typography.caption.copyWith(
+                                  color: colors.secondary,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
                           ],
@@ -623,7 +723,10 @@ class _PracticePageState extends ConsumerState<PracticePage> {
     );
   }
 
-  Widget _buildScoreboardOverlay(BuildContext context, PracticeSession session) {
+  Widget _buildScoreboardOverlay(
+    BuildContext context,
+    PracticeSession session,
+  ) {
     final spacing = context.swSpacing;
     final typography = context.swTypography;
 
@@ -643,7 +746,10 @@ class _PracticePageState extends ConsumerState<PracticePage> {
                 Text(
                   'ROUND SCOREBOARD',
                   textAlign: TextAlign.center,
-                  style: typography.heading.copyWith(fontWeight: FontWeight.w900, letterSpacing: 1.w),
+                  style: typography.heading.copyWith(
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 1.w,
+                  ),
                 ),
                 SizedBox(height: spacing.lg),
                 ...players.map((p) {
@@ -660,7 +766,9 @@ class _PracticePageState extends ConsumerState<PracticePage> {
                 Text(
                   'Advancing round shortly...',
                   textAlign: TextAlign.center,
-                  style: typography.caption.copyWith(fontStyle: FontStyle.italic),
+                  style: typography.caption.copyWith(
+                    fontStyle: FontStyle.italic,
+                  ),
                 ),
               ],
             ),
@@ -670,7 +778,10 @@ class _PracticePageState extends ConsumerState<PracticePage> {
     );
   }
 
-  Widget _buildPauseOverlay(BuildContext context, PracticeSessionState notifier) {
+  Widget _buildPauseOverlay(
+    BuildContext context,
+    PracticeSessionState notifier,
+  ) {
     final spacing = context.swSpacing;
     final typography = context.swTypography;
 
@@ -687,7 +798,9 @@ class _PracticePageState extends ConsumerState<PracticePage> {
                 Text(
                   'PRACTICE PAUSED',
                   textAlign: TextAlign.center,
-                  style: typography.heading.copyWith(fontWeight: FontWeight.w900),
+                  style: typography.heading.copyWith(
+                    fontWeight: FontWeight.w900,
+                  ),
                 ),
                 SizedBox(height: spacing.xl),
                 SWButton(
@@ -728,7 +841,10 @@ class _PracticePageState extends ConsumerState<PracticePage> {
   }
 
   Widget _buildCompletionScreen(
-      BuildContext context, PracticeSession session, PracticeSessionState notifier) {
+    BuildContext context,
+    PracticeSession session,
+    PracticeSessionState notifier,
+  ) {
     final colors = context.swColors;
     final spacing = context.swSpacing;
     final typography = context.swTypography;
@@ -746,7 +862,10 @@ class _PracticePageState extends ConsumerState<PracticePage> {
               Text(
                 'PRACTICE COMPLETE',
                 textAlign: TextAlign.center,
-                style: typography.title.copyWith(fontWeight: FontWeight.w900, fontSize: 26.sp),
+                style: typography.title.copyWith(
+                  fontWeight: FontWeight.w900,
+                  fontSize: 26.sp,
+                ),
               ),
               SizedBox(height: spacing.lg),
 
@@ -761,7 +880,13 @@ class _PracticePageState extends ConsumerState<PracticePage> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text('Total Score', style: typography.body),
-                        Text('${session.score}', style: typography.body.copyWith(fontWeight: FontWeight.bold, color: colors.secondary)),
+                        Text(
+                          '${session.score}',
+                          style: typography.body.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: colors.secondary,
+                          ),
+                        ),
                       ],
                     ),
                     Divider(color: colors.border),
@@ -770,7 +895,12 @@ class _PracticePageState extends ConsumerState<PracticePage> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text('Strokes Drawn', style: typography.body),
-                        Text('${stats.strokeCount}', style: typography.body.copyWith(fontWeight: FontWeight.bold)),
+                        Text(
+                          '${stats.strokeCount}',
+                          style: typography.body.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ],
                     ),
                     Divider(color: colors.border),
@@ -779,7 +909,12 @@ class _PracticePageState extends ConsumerState<PracticePage> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text('Avg Stroke Points', style: typography.body),
-                        Text(stats.averageStrokeLength.toStringAsFixed(1), style: typography.body.copyWith(fontWeight: FontWeight.bold)),
+                        Text(
+                          stats.averageStrokeLength.toStringAsFixed(1),
+                          style: typography.body.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ],
                     ),
                     Divider(color: colors.border),
@@ -788,7 +923,12 @@ class _PracticePageState extends ConsumerState<PracticePage> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text('Avg Round Time', style: typography.body),
-                        Text('${stats.averageRoundDuration.toStringAsFixed(1)}s', style: typography.body.copyWith(fontWeight: FontWeight.bold)),
+                        Text(
+                          '${stats.averageRoundDuration.toStringAsFixed(1)}s',
+                          style: typography.body.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ],
                     ),
                     Divider(color: colors.border),
@@ -797,7 +937,12 @@ class _PracticePageState extends ConsumerState<PracticePage> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text('Drawing Time', style: typography.body),
-                        Text('${stats.drawingDuration.round()}s', style: typography.body.copyWith(fontWeight: FontWeight.bold)),
+                        Text(
+                          '${stats.drawingDuration.round()}s',
+                          style: typography.body.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ],
                     ),
                     Divider(color: colors.border),
@@ -806,7 +951,12 @@ class _PracticePageState extends ConsumerState<PracticePage> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text('Pause Count', style: typography.body),
-                        Text('${stats.pauseCount}', style: typography.body.copyWith(fontWeight: FontWeight.bold)),
+                        Text(
+                          '${stats.pauseCount}',
+                          style: typography.body.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ],
                     ),
                     Divider(color: colors.border),
@@ -816,10 +966,14 @@ class _PracticePageState extends ConsumerState<PracticePage> {
                       children: [
                         Text('Replay Recording', style: typography.body),
                         Text(
-                          session.replayMetadata.isNotEmpty ? 'SAVED' : 'DISABLED',
+                          session.replayMetadata.isNotEmpty
+                              ? 'SAVED'
+                              : 'DISABLED',
                           style: typography.body.copyWith(
                             fontWeight: FontWeight.bold,
-                            color: session.replayMetadata.isNotEmpty ? colors.success : colors.danger,
+                            color: session.replayMetadata.isNotEmpty
+                                ? colors.success
+                                : colors.danger,
                           ),
                         ),
                       ],

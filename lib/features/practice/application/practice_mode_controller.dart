@@ -62,7 +62,7 @@ class PracticeModeController {
   /// Begins a new offline practice session.
   Future<void> startPractice(PracticeConfiguration config) async {
     _cleanupCoordinator();
-    
+
     _coordinator = PracticeSessionCoordinator(
       canvasController: canvasController,
       drawingBus: drawingBus,
@@ -143,8 +143,10 @@ class PracticeModeController {
       final dataStr = storage.get<String>(_autosaveKey);
       if (dataStr == null) return false;
 
-      final savedSession = PracticeSession.fromJson(json.decode(dataStr) as Map<String, dynamic>);
-      
+      final savedSession = PracticeSession.fromJson(
+        json.decode(dataStr) as Map<String, dynamic>,
+      );
+
       _coordinator = PracticeSessionCoordinator(
         canvasController: canvasController,
         drawingBus: drawingBus,

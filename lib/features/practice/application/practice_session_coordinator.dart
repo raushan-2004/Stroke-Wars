@@ -59,9 +59,9 @@ class PracticeSessionCoordinator {
     required this.onSessionUpdated,
     required this.onAutosaveTriggered,
     ClockProvider? clock,
-  })  : clock = clock ?? const SystemClock(),
-        replayRecorder = PracticeReplayRecorder(),
-        statsCollector = const PracticeStatisticsCollector() {
+  }) : clock = clock ?? const SystemClock(),
+       replayRecorder = PracticeReplayRecorder(),
+       statsCollector = const PracticeStatisticsCollector() {
     _initializeSession();
   }
 
@@ -140,7 +140,11 @@ class PracticeSessionCoordinator {
         ),
       ),
       canvasState: canvasController.state,
-      timerState: const TimerState(durationSecs: 0, elapsedSecs: 0, isRunning: false),
+      timerState: const TimerState(
+        durationSecs: 0,
+        elapsedSecs: 0,
+        isRunning: false,
+      ),
       score: 0,
       practiceStatistics: const PracticeStatistics(),
       configuration: configuration,
@@ -170,9 +174,18 @@ class PracticeSessionCoordinator {
       if (isDrawing && tick.timerState.isRunning && !tick.timerState.isPaused) {
         final engine = _botEngine;
         if (engine != null) {
-          final commands = engine.tick(tick.timerState.elapsedSecs, _session.currentMatch.id);
+          final commands = engine.tick(
+            tick.timerState.elapsedSecs,
+            _session.currentMatch.id,
+          );
           for (final cmd in commands) {
-            _commandProcessor.process(cmd).catchError((_) => Failure<CommandResult>(InvalidTransitionFailure('Bot command error')));
+            _commandProcessor
+                .process(cmd)
+                .catchError(
+                  (_) => Failure<CommandResult>(
+                    InvalidTransitionFailure('Bot command error'),
+                  ),
+                );
           }
         }
       }
@@ -213,40 +226,44 @@ class PracticeSessionCoordinator {
       final matchId = _session.currentMatch.id;
 
       // 1. Create Match
-      await _commandProcessor.process(CreateMatchCommand(
-        hostId: humanPlayerId,
-        configuration: config,
-      ));
+      await _commandProcessor.process(
+        CreateMatchCommand(hostId: humanPlayerId, configuration: config),
+      );
 
       // 2. Add Bots
       for (var i = 1; i <= configuration.botCount; i++) {
-        await _commandProcessor.process(JoinMatchCommand(
-          matchId: matchId,
-          playerId: 'bot-$i',
-          displayName: 'Bot ${['Alice', 'Bob', 'Charlie'][i - 1]}',
-        ));
+        await _commandProcessor.process(
+          JoinMatchCommand(
+            matchId: matchId,
+            playerId: 'bot-$i',
+            displayName: 'Bot ${['Alice', 'Bob', 'Charlie'][i - 1]}',
+          ),
+        );
       }
 
       // 3. Ready human and bots
-      await _commandProcessor.process(ReadyPlayerCommand(
-        matchId: matchId,
-        playerId: humanPlayerId,
-        isReady: true,
-      ));
+      await _commandProcessor.process(
+        ReadyPlayerCommand(
+          matchId: matchId,
+          playerId: humanPlayerId,
+          isReady: true,
+        ),
+      );
 
       for (var i = 1; i <= configuration.botCount; i++) {
-        await _commandProcessor.process(ReadyPlayerCommand(
-          matchId: matchId,
-          playerId: 'bot-$i',
-          isReady: true,
-        ));
+        await _commandProcessor.process(
+          ReadyPlayerCommand(
+            matchId: matchId,
+            playerId: 'bot-$i',
+            isReady: true,
+          ),
+        );
       }
 
       // 4. Start Match
-      await _commandProcessor.process(StartMatchCommand(
-        matchId: matchId,
-        hostId: humanPlayerId,
-      ));
+      await _commandProcessor.process(
+        StartMatchCommand(matchId: matchId, hostId: humanPlayerId),
+      );
 
       // 5. Start first round selection
       await _commandProcessor.process(StartRoundCommand(matchId: matchId));
@@ -259,11 +276,13 @@ class PracticeSessionCoordinator {
   Future<void> chooseWord(Word word) async {
     try {
       final matchId = _session.currentMatch.id;
-      await _commandProcessor.process(ChooseWordCommand(
-        matchId: matchId,
-        drawerId: humanPlayerId,
-        wordId: word.id,
-      ));
+      await _commandProcessor.process(
+        ChooseWordCommand(
+          matchId: matchId,
+          drawerId: humanPlayerId,
+          wordId: word.id,
+        ),
+      );
     } catch (_) {
       // Recovery
     }
@@ -282,7 +301,9 @@ class PracticeSessionCoordinator {
   Future<void> advanceNextRound() async {
     try {
       final match = _session.currentMatch;
-      final completedRounds = match.rounds.where((r) => r.state is RoundFinishedRoundState).length;
+      final completedRounds = match.rounds
+          .where((r) => r.state is RoundFinishedRoundState)
+          .length;
       if (completedRounds >= match.configuration.totalRounds) {
         await _commandProcessor.process(FinishMatchCommand(matchId: match.id));
       } else {
@@ -298,7 +319,9 @@ class PracticeSessionCoordinator {
     _isPaused = true;
     _matchController.matchClock.pause();
     _session = _session.copyWith(
-      practiceStatistics: statsCollector.processPause(_session.practiceStatistics),
+      practiceStatistics: statsCollector.processPause(
+        _session.practiceStatistics,
+      ),
       timerState: _matchController.matchClock.current.timerState,
     );
     onSessionUpdated(_session);
@@ -351,7 +374,7 @@ class PracticeSessionCoordinator {
       try {
         canvasController.resetHistory();
       } catch (_) {}
-      
+
       // Determine bots
       final botIds = nextMatch.players
           .where((p) => p.playerId != humanPlayerId)
@@ -406,7 +429,7 @@ class PracticeSessionCoordinator {
     _session = saved;
     // Restore match controller state
     _matchController.match = saved.currentMatch;
-    
+
     // Restore bots
     final chosenWord = saved.currentWord?.text ?? 'target';
     final incorrectWords = DefaultWordList.words

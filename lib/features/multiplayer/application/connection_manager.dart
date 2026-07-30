@@ -70,7 +70,8 @@ class ConnectionManager {
     _stateSub = transport.connectionState.listen(_handleTransportState);
   }
 
-  Stream<NetworkEnvelope> get inboundMessages => _inboundMessageController.stream;
+  Stream<NetworkEnvelope> get inboundMessages =>
+      _inboundMessageController.stream;
   NetworkStatistics get statistics => _stats;
   Stream<NetworkStatistics> get onStatisticsChanged => _statsController.stream;
   Stream<NetworkConnectionState> get connectionState => _stateController.stream;
@@ -156,15 +157,18 @@ class ConnectionManager {
         AppLogger.instance.warning('Peer timeout detected: $peerId');
         _peerLastSeen.remove(peerId);
         _peerTimeoutController.add(peerId);
-        _updateStats(_stats.copyWith(
-          heartbeatFailures: _stats.heartbeatFailures + 1,
-        ));
+        _updateStats(
+          _stats.copyWith(heartbeatFailures: _stats.heartbeatFailures + 1),
+        );
       }
     } else {
       // Client checks last seen from Host (represented as 'host' or host address)
       final hostLastSeen = _peerLastSeen['host'];
-      if (hostLastSeen != null && now.difference(hostLastSeen) > timeoutDuration) {
-        AppLogger.instance.warning('Host heartbeat timeout. Attempting reconnect...');
+      if (hostLastSeen != null &&
+          now.difference(hostLastSeen) > timeoutDuration) {
+        AppLogger.instance.warning(
+          'Host heartbeat timeout. Attempting reconnect...',
+        );
         _peerLastSeen.clear();
         _handleHostTimeout();
       }
@@ -174,23 +178,29 @@ class ConnectionManager {
   void _handleHostTimeout() {
     _stopTimers();
     _updateState(NetworkConnectionState.reconnecting);
-    _updateStats(_stats.copyWith(
-      reconnectCount: _stats.reconnectCount + 1,
-      heartbeatFailures: _stats.heartbeatFailures + 1,
-    ));
+    _updateStats(
+      _stats.copyWith(
+        reconnectCount: _stats.reconnectCount + 1,
+        heartbeatFailures: _stats.heartbeatFailures + 1,
+      ),
+    );
     _attemptReconnect();
   }
 
   Future<void> _attemptReconnect() async {
     if (_currentState != NetworkConnectionState.reconnecting) return;
     if (_reconnectAttempts >= maxReconnectAttempts) {
-      AppLogger.instance.error('Max reconnect attempts reached. Connection failed.');
+      AppLogger.instance.error(
+        'Max reconnect attempts reached. Connection failed.',
+      );
       _updateState(NetworkConnectionState.failed);
       return;
     }
 
     _reconnectAttempts++;
-    AppLogger.instance.info('Reconnection attempt $_reconnectAttempts/$maxReconnectAttempts...');
+    AppLogger.instance.info(
+      'Reconnection attempt $_reconnectAttempts/$maxReconnectAttempts...',
+    );
     try {
       await transport.connect(_lastConnectedAddress!, _lastConnectedPort!);
       // If success, state switches to connected via _handleTransportState
@@ -204,7 +214,9 @@ class ConnectionManager {
   Future<void> sendPayload(NetworkMessage msg, {String? targetPeerId}) async {
     _outboundSeqNum++;
     final envelope = NetworkEnvelope(
-      messageId: MessageId('msg_${DateTime.now().microsecondsSinceEpoch}_${localConnectionId.value}'),
+      messageId: MessageId(
+        'msg_${DateTime.now().microsecondsSinceEpoch}_${localConnectionId.value}',
+      ),
       sessionId: sessionId,
       connectionId: localConnectionId,
       protocolVersion: serializer.currentProtocolVersion,
@@ -229,7 +241,9 @@ class ConnectionManager {
   void _handleRawMessage(TransportMessage rawMsg) {
     try {
       final envelope = serializer.decode(rawMsg.content);
-      _updateStats(_stats.copyWith(packetsReceived: _stats.packetsReceived + 1));
+      _updateStats(
+        _stats.copyWith(packetsReceived: _stats.packetsReceived + 1),
+      );
 
       // 1. Validate version compatibility
       final versionErr = serializer.validateVersions(envelope);
@@ -247,7 +261,9 @@ class ConnectionManager {
       final int lastSeq = _lastSeenSequencePerPeer[sender] ?? 0;
       if (envelope.sequenceNumber <= lastSeq) {
         // Duplicate or out-of-order stale packet, drop it
-        _updateStats(_stats.copyWith(packetsDropped: _stats.packetsDropped + 1));
+        _updateStats(
+          _stats.copyWith(packetsDropped: _stats.packetsDropped + 1),
+        );
         return;
       }
       _lastSeenSequencePerPeer[sender] = envelope.sequenceNumber;
@@ -267,14 +283,21 @@ class ConnectionManager {
         );
       } else if (payload is PongMessage) {
         final now = DateTime.now();
-        final rtt = now.difference(payload.pingSentAt).inMilliseconds.toDouble();
-        final double jitter = _lastLatencyMs == 0.0 ? 0.0 : (rtt - _lastLatencyMs).abs();
+        final rtt = now
+            .difference(payload.pingSentAt)
+            .inMilliseconds
+            .toDouble();
+        final double jitter = _lastLatencyMs == 0.0
+            ? 0.0
+            : (rtt - _lastLatencyMs).abs();
         _lastLatencyMs = rtt;
 
-        _updateStats(_stats.copyWith(
-          latencyMs: rtt,
-          jitterMs: _stats.jitterMs * 0.8 + jitter * 0.2,
-        ));
+        _updateStats(
+          _stats.copyWith(
+            latencyMs: rtt,
+            jitterMs: _stats.jitterMs * 0.8 + jitter * 0.2,
+          ),
+        );
       } else if (payload is HeartbeatMessage) {
         // Received heartbeat from Host, presence updated
       }

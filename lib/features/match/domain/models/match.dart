@@ -41,42 +41,43 @@ class Match {
     configuration: MatchConfiguration.fromJson(
       json['configuration'] as Map<String, dynamic>,
     ),
-    players:
-        (json['players'] as List<dynamic>)
-            .map((p) => PlayerSlot.fromJson(p as Map<String, dynamic>))
-            .toList(),
-    rounds:
-        (json['rounds'] as List<dynamic>)
-            .map((r) => Round.fromJson(r as Map<String, dynamic>))
-            .toList(),
+    players: (json['players'] as List<dynamic>)
+        .map((p) => PlayerSlot.fromJson(p as Map<String, dynamic>))
+        .toList(),
+    rounds: (json['rounds'] as List<dynamic>)
+        .map((r) => Round.fromJson(r as Map<String, dynamic>))
+        .toList(),
     state: _stateFromJson(json['state'] as String),
     createdAt: DateTime.parse(json['createdAt'] as String),
-    startedAt:
-        json['startedAt'] != null
-            ? DateTime.parse(json['startedAt'] as String)
-            : null,
-    result:
-        json['result'] != null
-            ? MatchResult.fromJson(json['result'] as Map<String, dynamic>)
-            : null,
+    startedAt: json['startedAt'] != null
+        ? DateTime.parse(json['startedAt'] as String)
+        : null,
+    result: json['result'] != null
+        ? MatchResult.fromJson(json['result'] as Map<String, dynamic>)
+        : null,
     currentRoundIndex: json['currentRoundIndex'] as int? ?? 0,
-    commandHistory: (json['commandHistory'] as List<dynamic>?)
+    commandHistory:
+        (json['commandHistory'] as List<dynamic>?)
             ?.map((c) => _commandFromJson(c as Map<String, dynamic>))
             .toList() ??
         const [],
-    eventHistory: (json['eventHistory'] as List<dynamic>?)
+    eventHistory:
+        (json['eventHistory'] as List<dynamic>?)
             ?.map((e) => MatchEvent.fromJson(e as Map<String, dynamic>))
             .toList() ??
         const [],
-    transitionHistory: (json['transitionHistory'] as List<dynamic>?)
+    transitionHistory:
+        (json['transitionHistory'] as List<dynamic>?)
             ?.map((t) => StateTransition.fromJson(t as Map<String, dynamic>))
             .toList() ??
         const [],
-    turnHistory: (json['turnHistory'] as List<dynamic>?)
+    turnHistory:
+        (json['turnHistory'] as List<dynamic>?)
             ?.map((t) => PlayerTurn.fromJson(t as Map<String, dynamic>))
             .toList() ??
         const [],
-    scoreHistory: (json['scoreHistory'] as List<dynamic>?)
+    scoreHistory:
+        (json['scoreHistory'] as List<dynamic>?)
             ?.map((s) => Score.fromJson(s as Map<String, dynamic>))
             .toList() ??
         const [],
@@ -187,8 +188,8 @@ class Match {
   /// Currently active round, or null if not yet started.
   Round? get currentRound =>
       rounds.isNotEmpty && currentRoundIndex < rounds.length
-          ? rounds[currentRoundIndex]
-          : null;
+      ? rounds[currentRoundIndex]
+      : null;
 
   /// Connected (active) players.
   List<PlayerSlot> get connectedPlayers =>
@@ -254,7 +255,9 @@ class Match {
     'startedAt': startedAt?.toIso8601String(),
     'result': result?.toJson(),
     'currentRoundIndex': currentRoundIndex,
-    'commandHistory': commandHistory.map((c) => {'type': c.runtimeType.toString()}).toList(),
+    'commandHistory': commandHistory
+        .map((c) => {'type': c.runtimeType.toString()})
+        .toList(),
     'eventHistory': eventHistory.map((e) => e.toJson()).toList(),
     'transitionHistory': transitionHistory.map((t) => t.toJson()).toList(),
     'turnHistory': turnHistory.map((t) => t.toJson()).toList(),

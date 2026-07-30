@@ -286,9 +286,7 @@ class MatchStartedEvent extends MatchEvent {
   });
 
   @override
-  Map<String, dynamic> toSpecificJson() => {
-    'type': 'match_started',
-  };
+  Map<String, dynamic> toSpecificJson() => {'type': 'match_started'};
 }
 
 /// The match completed normally with a winner.
@@ -620,9 +618,7 @@ class TimerExpiredEvent extends MatchEvent {
   });
 
   @override
-  Map<String, dynamic> toSpecificJson() => {
-    'type': 'timer_expired',
-  };
+  Map<String, dynamic> toSpecificJson() => {'type': 'timer_expired'};
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

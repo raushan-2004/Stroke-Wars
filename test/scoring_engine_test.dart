@@ -22,7 +22,10 @@ void main() {
           config: config,
           isFirstGuesser: false,
         );
-        expect(result.points, greaterThanOrEqualTo(ScoreRules.baseCorrectGuess));
+        expect(
+          result.points,
+          greaterThanOrEqualTo(ScoreRules.baseCorrectGuess),
+        );
       });
 
       test('early guess earns time bonus', () {
@@ -211,7 +214,11 @@ void main() {
       const victoryRules = VictoryRules();
 
       test('returns winner when one player leads', () {
-        final winner = victoryRules.determineWinner({'p1': 500, 'p2': 300, 'p3': 100});
+        final winner = victoryRules.determineWinner({
+          'p1': 500,
+          'p2': 300,
+          'p3': 100,
+        });
         expect(winner, 'p1');
       });
 

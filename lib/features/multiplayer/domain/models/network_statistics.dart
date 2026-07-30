@@ -54,17 +54,18 @@ class NetworkStatistics {
 
   /// Converts this instance to a JSON map.
   Map<String, dynamic> toJson() => {
-        'latencyMs': latencyMs,
-        'jitterMs': jitterMs,
-        'packetsSent': packetsSent,
-        'packetsReceived': packetsReceived,
-        'packetsDropped': packetsDropped,
-        'reconnectCount': reconnectCount,
-        'heartbeatFailures': heartbeatFailures,
-      };
+    'latencyMs': latencyMs,
+    'jitterMs': jitterMs,
+    'packetsSent': packetsSent,
+    'packetsReceived': packetsReceived,
+    'packetsDropped': packetsDropped,
+    'reconnectCount': reconnectCount,
+    'heartbeatFailures': heartbeatFailures,
+  };
 
   /// Restores this instance from a JSON map.
-  factory NetworkStatistics.fromJson(Map<String, dynamic> json) => NetworkStatistics(
+  factory NetworkStatistics.fromJson(Map<String, dynamic> json) =>
+      NetworkStatistics(
         latencyMs: (json['latencyMs'] as num?)?.toDouble() ?? 0.0,
         jitterMs: (json['jitterMs'] as num?)?.toDouble() ?? 0.0,
         packetsSent: json['packetsSent'] as int? ?? 0,
