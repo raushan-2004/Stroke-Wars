@@ -172,3 +172,28 @@ class CancelMatchCommand extends MatchCommand {
   /// Human-readable reason for cancellation.
   final String reason;
 }
+
+/// A player confirms their readiness or toggles readiness status.
+class ReadyPlayerCommand extends MatchCommand {
+  /// Creates a [ReadyPlayerCommand].
+  const ReadyPlayerCommand({
+    required this.matchId,
+    required this.playerId,
+    required this.isReady,
+  });
+
+  /// The match ID.
+  final MatchId matchId;
+
+  /// UUID of the player toggling readiness.
+  final String playerId;
+
+  /// Readiness status flag.
+  final bool isReady;
+}
+
+/// A dummy fallback match command used only when deserializing transition audits.
+class DummyMatchCommand extends MatchCommand {
+  const DummyMatchCommand(this.name);
+  final String name;
+}

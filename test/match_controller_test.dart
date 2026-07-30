@@ -1,6 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stroke_wars/features/match/application/match_controller.dart';
 import 'package:stroke_wars/features/match/application/match_event_bus.dart';
+import 'package:stroke_wars/features/match/application/clock_provider.dart';
+import 'package:stroke_wars/features/match/application/sequence_generator.dart';
 import 'package:stroke_wars/features/match/application/match_validator.dart';
 import 'package:stroke_wars/features/match/application/random_provider.dart';
 import 'package:stroke_wars/features/match/application/rule_engine.dart';
@@ -45,6 +47,8 @@ void main() {
         rules: rules,
         scoring: scoring,
         wordSelector: wordSelector,
+        clock: const SystemClock(),
+        sequenceGenerator: SequenceGenerator(),
       );
     });
 

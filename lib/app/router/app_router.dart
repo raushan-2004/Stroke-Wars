@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import 'package:stroke_wars/features/canvas/presentation/pages/practice_page.dart';
+import 'package:stroke_wars/features/practice/presentation/practice_page.dart';
 import 'package:stroke_wars/features/home/domain/repositories/dashboard_registry.dart';
 import 'package:stroke_wars/features/home/presentation/game_command_center_page.dart';
 import 'package:stroke_wars/features/home/presentation/placeholder_page.dart';

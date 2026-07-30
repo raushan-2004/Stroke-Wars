@@ -14,7 +14,14 @@ import 'package:stroke_wars/features/match/domain/models/match_id.dart';
 /// events express completed history.
 sealed class MatchEvent {
   /// Creates a [MatchEvent].
-  const MatchEvent({required this.matchId, required this.timestamp});
+  const MatchEvent({
+    required this.matchId,
+    required this.timestamp,
+    this.roundId,
+    this.sequenceNumber = 0,
+    this.originPlayer,
+    this.eventVersion = 1,
+  });
 
   /// The match this event belongs to.
   final MatchId matchId;
@@ -22,39 +29,90 @@ sealed class MatchEvent {
   /// When this event occurred.
   final DateTime timestamp;
 
+  /// Active round ID, if any.
+  final String? roundId;
+
+  /// Monotonically increasing sequence number assigned by SequenceGenerator.
+  final int sequenceNumber;
+
+  /// UUID of the player who triggered the event, or null if system/clock.
+  final String? originPlayer;
+
+  /// Schema version of the event for replay compatibility.
+  final int eventVersion;
+
+  /// Subclasses override this to provide specific JSON fields.
+  Map<String, dynamic> toSpecificJson();
+
   /// Converts this event to a JSON-serializable map.
-  Map<String, dynamic> toJson();
+  Map<String, dynamic> toJson() => {
+    ...toSpecificJson(),
+    'matchId': matchId.value,
+    'timestamp': timestamp.toIso8601String(),
+    'roundId': roundId,
+    'sequenceNumber': sequenceNumber,
+    'originPlayer': originPlayer,
+    'eventVersion': eventVersion,
+  };
 
   /// Reconstructs a [MatchEvent] from a JSON map.
   static MatchEvent fromJson(Map<String, dynamic> json) {
     final type = json['type'] as String;
     final matchId = MatchId(json['matchId'] as String);
     final timestamp = DateTime.parse(json['timestamp'] as String);
+    final roundId = json['roundId'] as String?;
+    final sequenceNumber = json['sequenceNumber'] as int? ?? 0;
+    final originPlayer = json['originPlayer'] as String?;
+    final eventVersion = json['eventVersion'] as int? ?? 1;
+
     switch (type) {
       case 'match_created':
         return MatchCreatedEvent(
           matchId: matchId,
           timestamp: timestamp,
+          roundId: roundId,
+          sequenceNumber: sequenceNumber,
+          originPlayer: originPlayer,
+          eventVersion: eventVersion,
           hostId: json['hostId'] as String,
         );
       case 'match_started':
-        return MatchStartedEvent(matchId: matchId, timestamp: timestamp);
+        return MatchStartedEvent(
+          matchId: matchId,
+          timestamp: timestamp,
+          roundId: roundId,
+          sequenceNumber: sequenceNumber,
+          originPlayer: originPlayer,
+          eventVersion: eventVersion,
+        );
       case 'match_ended':
         return MatchEndedEvent(
           matchId: matchId,
           timestamp: timestamp,
+          roundId: roundId,
+          sequenceNumber: sequenceNumber,
+          originPlayer: originPlayer,
+          eventVersion: eventVersion,
           winnerId: json['winnerId'] as String,
         );
       case 'match_cancelled':
         return MatchCancelledEvent(
           matchId: matchId,
           timestamp: timestamp,
+          roundId: roundId,
+          sequenceNumber: sequenceNumber,
+          originPlayer: originPlayer,
+          eventVersion: eventVersion,
           reason: json['reason'] as String,
         );
       case 'player_joined':
         return PlayerJoinedEvent(
           matchId: matchId,
           timestamp: timestamp,
+          roundId: roundId,
+          sequenceNumber: sequenceNumber,
+          originPlayer: originPlayer,
+          eventVersion: eventVersion,
           playerId: json['playerId'] as String,
           displayName: json['displayName'] as String,
         );
@@ -62,18 +120,41 @@ sealed class MatchEvent {
         return PlayerLeftEvent(
           matchId: matchId,
           timestamp: timestamp,
+          roundId: roundId,
+          sequenceNumber: sequenceNumber,
+          originPlayer: originPlayer,
+          eventVersion: eventVersion,
           playerId: json['playerId'] as String,
         );
       case 'player_skipped':
         return PlayerSkippedEvent(
           matchId: matchId,
           timestamp: timestamp,
+          roundId: roundId,
+          sequenceNumber: sequenceNumber,
+          originPlayer: originPlayer,
+          eventVersion: eventVersion,
           playerId: json['playerId'] as String,
+        );
+      case 'player_readiness':
+        return PlayerReadinessEvent(
+          matchId: matchId,
+          timestamp: timestamp,
+          roundId: roundId,
+          sequenceNumber: sequenceNumber,
+          originPlayer: originPlayer,
+          eventVersion: eventVersion,
+          playerId: json['playerId'] as String,
+          isReady: json['isReady'] as bool,
         );
       case 'round_started':
         return RoundStartedEvent(
           matchId: matchId,
           timestamp: timestamp,
+          roundId: roundId,
+          sequenceNumber: sequenceNumber,
+          originPlayer: originPlayer,
+          eventVersion: eventVersion,
           roundNumber: json['roundNumber'] as int,
           drawerId: json['drawerId'] as String,
         );
@@ -81,12 +162,20 @@ sealed class MatchEvent {
         return RoundEndedEvent(
           matchId: matchId,
           timestamp: timestamp,
+          roundId: roundId,
+          sequenceNumber: sequenceNumber,
+          originPlayer: originPlayer,
+          eventVersion: eventVersion,
           roundNumber: json['roundNumber'] as int,
         );
       case 'word_chosen':
         return WordChosenEvent(
           matchId: matchId,
           timestamp: timestamp,
+          roundId: roundId,
+          sequenceNumber: sequenceNumber,
+          originPlayer: originPlayer,
+          eventVersion: eventVersion,
           roundNumber: json['roundNumber'] as int,
           wordId: json['wordId'] as String,
         );
@@ -94,6 +183,10 @@ sealed class MatchEvent {
         return WordRevealedEvent(
           matchId: matchId,
           timestamp: timestamp,
+          roundId: roundId,
+          sequenceNumber: sequenceNumber,
+          originPlayer: originPlayer,
+          eventVersion: eventVersion,
           roundNumber: json['roundNumber'] as int,
           wordText: json['wordText'] as String,
         );
@@ -101,6 +194,10 @@ sealed class MatchEvent {
         return GuessSubmittedEvent(
           matchId: matchId,
           timestamp: timestamp,
+          roundId: roundId,
+          sequenceNumber: sequenceNumber,
+          originPlayer: originPlayer,
+          eventVersion: eventVersion,
           playerId: json['playerId'] as String,
           guessText: json['guessText'] as String,
         );
@@ -108,6 +205,10 @@ sealed class MatchEvent {
         return CorrectGuessEvent(
           matchId: matchId,
           timestamp: timestamp,
+          roundId: roundId,
+          sequenceNumber: sequenceNumber,
+          originPlayer: originPlayer,
+          eventVersion: eventVersion,
           playerId: json['playerId'] as String,
           guessTimeMs: json['guessTimeMs'] as int,
           pointsAwarded: json['pointsAwarded'] as int,
@@ -116,14 +217,29 @@ sealed class MatchEvent {
         return TimerTickEvent(
           matchId: matchId,
           timestamp: timestamp,
+          roundId: roundId,
+          sequenceNumber: sequenceNumber,
+          originPlayer: originPlayer,
+          eventVersion: eventVersion,
           remainingSecs: json['remainingSecs'] as int,
         );
       case 'timer_expired':
-        return TimerExpiredEvent(matchId: matchId, timestamp: timestamp);
+        return TimerExpiredEvent(
+          matchId: matchId,
+          timestamp: timestamp,
+          roundId: roundId,
+          sequenceNumber: sequenceNumber,
+          originPlayer: originPlayer,
+          eventVersion: eventVersion,
+        );
       case 'score_updated':
         return ScoreUpdatedEvent(
           matchId: matchId,
           timestamp: timestamp,
+          roundId: roundId,
+          sequenceNumber: sequenceNumber,
+          originPlayer: originPlayer,
+          eventVersion: eventVersion,
           playerId: json['playerId'] as String,
           newTotal: json['newTotal'] as int,
         );
@@ -139,76 +255,80 @@ sealed class MatchEvent {
 
 /// A new match was created.
 class MatchCreatedEvent extends MatchEvent {
-  /// Creates a [MatchCreatedEvent].
   const MatchCreatedEvent({
     required super.matchId,
     required super.timestamp,
+    super.roundId,
+    super.sequenceNumber,
+    super.originPlayer,
+    super.eventVersion,
     required this.hostId,
   });
 
-  /// UUID of the creating host.
   final String hostId;
 
   @override
-  Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toSpecificJson() => {
     'type': 'match_created',
-    'matchId': matchId.value,
-    'timestamp': timestamp.toIso8601String(),
     'hostId': hostId,
   };
 }
 
 /// The match transitioned from waiting/starting to active play.
 class MatchStartedEvent extends MatchEvent {
-  /// Creates a [MatchStartedEvent].
-  const MatchStartedEvent({required super.matchId, required super.timestamp});
+  const MatchStartedEvent({
+    required super.matchId,
+    required super.timestamp,
+    super.roundId,
+    super.sequenceNumber,
+    super.originPlayer,
+    super.eventVersion,
+  });
 
   @override
-  Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toSpecificJson() => {
     'type': 'match_started',
-    'matchId': matchId.value,
-    'timestamp': timestamp.toIso8601String(),
   };
 }
 
 /// The match completed normally with a winner.
 class MatchEndedEvent extends MatchEvent {
-  /// Creates a [MatchEndedEvent].
   const MatchEndedEvent({
     required super.matchId,
     required super.timestamp,
+    super.roundId,
+    super.sequenceNumber,
+    super.originPlayer,
+    super.eventVersion,
     required this.winnerId,
   });
 
-  /// UUID of the winning player.
   final String winnerId;
 
   @override
-  Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toSpecificJson() => {
     'type': 'match_ended',
-    'matchId': matchId.value,
-    'timestamp': timestamp.toIso8601String(),
     'winnerId': winnerId,
   };
 }
 
 /// The match was cancelled before completion.
 class MatchCancelledEvent extends MatchEvent {
-  /// Creates a [MatchCancelledEvent].
   const MatchCancelledEvent({
     required super.matchId,
     required super.timestamp,
+    super.roundId,
+    super.sequenceNumber,
+    super.originPlayer,
+    super.eventVersion,
     required this.reason,
   });
 
-  /// Human-readable reason for cancellation.
   final String reason;
 
   @override
-  Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toSpecificJson() => {
     'type': 'match_cancelled',
-    'matchId': matchId.value,
-    'timestamp': timestamp.toIso8601String(),
     'reason': reason,
   };
 }
@@ -219,25 +339,23 @@ class MatchCancelledEvent extends MatchEvent {
 
 /// A player successfully joined the match.
 class PlayerJoinedEvent extends MatchEvent {
-  /// Creates a [PlayerJoinedEvent].
   const PlayerJoinedEvent({
     required super.matchId,
     required super.timestamp,
+    super.roundId,
+    super.sequenceNumber,
+    super.originPlayer,
+    super.eventVersion,
     required this.playerId,
     required this.displayName,
   });
 
-  /// UUID of the joining player.
   final String playerId;
-
-  /// Display name of the joining player.
   final String displayName;
 
   @override
-  Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toSpecificJson() => {
     'type': 'player_joined',
-    'matchId': matchId.value,
-    'timestamp': timestamp.toIso8601String(),
     'playerId': playerId,
     'displayName': displayName,
   };
@@ -245,43 +363,67 @@ class PlayerJoinedEvent extends MatchEvent {
 
 /// A player left or disconnected from the match.
 class PlayerLeftEvent extends MatchEvent {
-  /// Creates a [PlayerLeftEvent].
   const PlayerLeftEvent({
     required super.matchId,
     required super.timestamp,
+    super.roundId,
+    super.sequenceNumber,
+    super.originPlayer,
+    super.eventVersion,
     required this.playerId,
   });
 
-  /// UUID of the departing player.
   final String playerId;
 
   @override
-  Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toSpecificJson() => {
     'type': 'player_left',
-    'matchId': matchId.value,
-    'timestamp': timestamp.toIso8601String(),
     'playerId': playerId,
   };
 }
 
 /// A player's turn was skipped (disconnected or timed out).
 class PlayerSkippedEvent extends MatchEvent {
-  /// Creates a [PlayerSkippedEvent].
   const PlayerSkippedEvent({
     required super.matchId,
     required super.timestamp,
+    super.roundId,
+    super.sequenceNumber,
+    super.originPlayer,
+    super.eventVersion,
     required this.playerId,
   });
 
-  /// UUID of the skipped player.
   final String playerId;
 
   @override
-  Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toSpecificJson() => {
     'type': 'player_skipped',
-    'matchId': matchId.value,
-    'timestamp': timestamp.toIso8601String(),
     'playerId': playerId,
+  };
+}
+
+/// A player has toggled readiness state.
+class PlayerReadinessEvent extends MatchEvent {
+  const PlayerReadinessEvent({
+    required super.matchId,
+    required super.timestamp,
+    super.roundId,
+    super.sequenceNumber,
+    super.originPlayer,
+    super.eventVersion,
+    required this.playerId,
+    required this.isReady,
+  });
+
+  final String playerId;
+  final bool isReady;
+
+  @override
+  Map<String, dynamic> toSpecificJson() => {
+    'type': 'player_readiness',
+    'playerId': playerId,
+    'isReady': isReady,
   };
 }
 
@@ -291,25 +433,23 @@ class PlayerSkippedEvent extends MatchEvent {
 
 /// A new round started.
 class RoundStartedEvent extends MatchEvent {
-  /// Creates a [RoundStartedEvent].
   const RoundStartedEvent({
     required super.matchId,
     required super.timestamp,
+    super.roundId,
+    super.sequenceNumber,
+    super.originPlayer,
+    super.eventVersion,
     required this.roundNumber,
     required this.drawerId,
   });
 
-  /// 1-based round number.
   final int roundNumber;
-
-  /// UUID of the player drawing this round.
   final String drawerId;
 
   @override
-  Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toSpecificJson() => {
     'type': 'round_started',
-    'matchId': matchId.value,
-    'timestamp': timestamp.toIso8601String(),
     'roundNumber': roundNumber,
     'drawerId': drawerId,
   };
@@ -317,21 +457,21 @@ class RoundStartedEvent extends MatchEvent {
 
 /// A round concluded.
 class RoundEndedEvent extends MatchEvent {
-  /// Creates a [RoundEndedEvent].
   const RoundEndedEvent({
     required super.matchId,
     required super.timestamp,
+    super.roundId,
+    super.sequenceNumber,
+    super.originPlayer,
+    super.eventVersion,
     required this.roundNumber,
   });
 
-  /// 1-based round number.
   final int roundNumber;
 
   @override
-  Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toSpecificJson() => {
     'type': 'round_ended',
-    'matchId': matchId.value,
-    'timestamp': timestamp.toIso8601String(),
     'roundNumber': roundNumber,
   };
 }
@@ -342,25 +482,23 @@ class RoundEndedEvent extends MatchEvent {
 
 /// The drawer chose a word.
 class WordChosenEvent extends MatchEvent {
-  /// Creates a [WordChosenEvent].
   const WordChosenEvent({
     required super.matchId,
     required super.timestamp,
+    super.roundId,
+    super.sequenceNumber,
+    super.originPlayer,
+    super.eventVersion,
     required this.roundNumber,
     required this.wordId,
   });
 
-  /// Round this word was chosen for.
   final int roundNumber;
-
-  /// ID of the chosen word.
   final String wordId;
 
   @override
-  Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toSpecificJson() => {
     'type': 'word_chosen',
-    'matchId': matchId.value,
-    'timestamp': timestamp.toIso8601String(),
     'roundNumber': roundNumber,
     'wordId': wordId,
   };
@@ -368,25 +506,23 @@ class WordChosenEvent extends MatchEvent {
 
 /// The word was revealed to all players at round end.
 class WordRevealedEvent extends MatchEvent {
-  /// Creates a [WordRevealedEvent].
   const WordRevealedEvent({
     required super.matchId,
     required super.timestamp,
+    super.roundId,
+    super.sequenceNumber,
+    super.originPlayer,
+    super.eventVersion,
     required this.roundNumber,
     required this.wordText,
   });
 
-  /// Round this word was drawn in.
   final int roundNumber;
-
-  /// The full word text (revealed post-round).
   final String wordText;
 
   @override
-  Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toSpecificJson() => {
     'type': 'word_revealed',
-    'matchId': matchId.value,
-    'timestamp': timestamp.toIso8601String(),
     'roundNumber': roundNumber,
     'wordText': wordText,
   };
@@ -398,25 +534,23 @@ class WordRevealedEvent extends MatchEvent {
 
 /// A player submitted a guess attempt.
 class GuessSubmittedEvent extends MatchEvent {
-  /// Creates a [GuessSubmittedEvent].
   const GuessSubmittedEvent({
     required super.matchId,
     required super.timestamp,
+    super.roundId,
+    super.sequenceNumber,
+    super.originPlayer,
+    super.eventVersion,
     required this.playerId,
     required this.guessText,
   });
 
-  /// UUID of the guessing player.
   final String playerId;
-
-  /// The text they submitted.
   final String guessText;
 
   @override
-  Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toSpecificJson() => {
     'type': 'guess_submitted',
-    'matchId': matchId.value,
-    'timestamp': timestamp.toIso8601String(),
     'playerId': playerId,
     'guessText': guessText,
   };
@@ -424,29 +558,25 @@ class GuessSubmittedEvent extends MatchEvent {
 
 /// A player guessed correctly.
 class CorrectGuessEvent extends MatchEvent {
-  /// Creates a [CorrectGuessEvent].
   const CorrectGuessEvent({
     required super.matchId,
     required super.timestamp,
+    super.roundId,
+    super.sequenceNumber,
+    super.originPlayer,
+    super.eventVersion,
     required this.playerId,
     required this.guessTimeMs,
     required this.pointsAwarded,
   });
 
-  /// UUID of the player who guessed correctly.
   final String playerId;
-
-  /// Time elapsed from round start in milliseconds.
   final int guessTimeMs;
-
-  /// Points awarded for this correct guess.
   final int pointsAwarded;
 
   @override
-  Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toSpecificJson() => {
     'type': 'correct_guess',
-    'matchId': matchId.value,
-    'timestamp': timestamp.toIso8601String(),
     'playerId': playerId,
     'guessTimeMs': guessTimeMs,
     'pointsAwarded': pointsAwarded,
@@ -459,35 +589,39 @@ class CorrectGuessEvent extends MatchEvent {
 
 /// One second elapsed on the active timer.
 class TimerTickEvent extends MatchEvent {
-  /// Creates a [TimerTickEvent].
   const TimerTickEvent({
     required super.matchId,
     required super.timestamp,
+    super.roundId,
+    super.sequenceNumber,
+    super.originPlayer,
+    super.eventVersion,
     required this.remainingSecs,
   });
 
-  /// Remaining seconds on the timer.
   final int remainingSecs;
 
   @override
-  Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toSpecificJson() => {
     'type': 'timer_tick',
-    'matchId': matchId.value,
-    'timestamp': timestamp.toIso8601String(),
     'remainingSecs': remainingSecs,
   };
 }
 
 /// The active timer reached zero.
 class TimerExpiredEvent extends MatchEvent {
-  /// Creates a [TimerExpiredEvent].
-  const TimerExpiredEvent({required super.matchId, required super.timestamp});
+  const TimerExpiredEvent({
+    required super.matchId,
+    required super.timestamp,
+    super.roundId,
+    super.sequenceNumber,
+    super.originPlayer,
+    super.eventVersion,
+  });
 
   @override
-  Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toSpecificJson() => {
     'type': 'timer_expired',
-    'matchId': matchId.value,
-    'timestamp': timestamp.toIso8601String(),
   };
 }
 
@@ -497,25 +631,23 @@ class TimerExpiredEvent extends MatchEvent {
 
 /// A player's cumulative score was updated.
 class ScoreUpdatedEvent extends MatchEvent {
-  /// Creates a [ScoreUpdatedEvent].
   const ScoreUpdatedEvent({
     required super.matchId,
     required super.timestamp,
+    super.roundId,
+    super.sequenceNumber,
+    super.originPlayer,
+    super.eventVersion,
     required this.playerId,
     required this.newTotal,
   });
 
-  /// UUID of the player whose score changed.
   final String playerId;
-
-  /// New cumulative total score.
   final int newTotal;
 
   @override
-  Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toSpecificJson() => {
     'type': 'score_updated',
-    'matchId': matchId.value,
-    'timestamp': timestamp.toIso8601String(),
     'playerId': playerId,
     'newTotal': newTotal,
   };

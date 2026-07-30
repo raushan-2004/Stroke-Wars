@@ -54,7 +54,7 @@ class MatchValidator {
     WordSelectionState: {DrawingState, MatchCancelledState},
     DrawingState: {GuessingState, RoundFinishedState, MatchCancelledState},
     GuessingState: {RoundFinishedState, MatchCancelledState},
-    RoundFinishedState: {ScoreboardState, MatchCancelledState},
+    RoundFinishedState: {ScoreboardState, MatchFinishedState, MatchCancelledState},
     ScoreboardState: {
       WordSelectionState, // next round
       MatchFinishedState,

@@ -18,7 +18,7 @@ import 'package:stroke_wars/features/match/domain/events/match_event.dart';
 /// Subscribers never communicate directly with [MatchController].
 class MatchEventBus {
   /// Creates a [MatchEventBus].
-  MatchEventBus() : _controller = StreamController<MatchEvent>.broadcast();
+  MatchEventBus() : _controller = StreamController<MatchEvent>.broadcast(sync: true);
 
   final StreamController<MatchEvent> _controller;
   bool _disposed = false;

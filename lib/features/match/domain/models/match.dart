@@ -1,13 +1,18 @@
+import 'package:stroke_wars/features/match/domain/commands/match_command.dart';
+import 'package:stroke_wars/features/match/domain/events/match_event.dart';
 import 'package:stroke_wars/features/match/domain/models/match_configuration.dart';
 import 'package:stroke_wars/features/match/domain/models/match_id.dart';
 import 'package:stroke_wars/features/match/domain/models/match_result.dart';
 import 'package:stroke_wars/features/match/domain/models/match_state.dart';
 import 'package:stroke_wars/features/match/domain/models/player_slot.dart';
+import 'package:stroke_wars/features/match/domain/models/player_turn.dart';
 import 'package:stroke_wars/features/match/domain/models/round.dart';
+import 'package:stroke_wars/features/match/domain/models/score.dart';
+import 'package:stroke_wars/features/match/domain/models/state_transition.dart';
 
 /// The top-level immutable aggregate root for a Stroke Wars match.
 ///
-/// [Match] is the single source of truth for all gameplay state.
+/// [Match] is the single source of truth for all gameplay state and audit history.
 /// All changes are expressed as new [Match] instances via [copyWith].
 class Match {
   /// Creates an immutable [Match].
@@ -22,6 +27,11 @@ class Match {
     this.startedAt,
     this.result,
     this.currentRoundIndex = 0,
+    this.commandHistory = const [],
+    this.eventHistory = const [],
+    this.transitionHistory = const [],
+    this.turnHistory = const [],
+    this.scoreHistory = const [],
   });
 
   /// Creates a [Match] from a JSON map.
@@ -50,6 +60,26 @@ class Match {
             ? MatchResult.fromJson(json['result'] as Map<String, dynamic>)
             : null,
     currentRoundIndex: json['currentRoundIndex'] as int? ?? 0,
+    commandHistory: (json['commandHistory'] as List<dynamic>?)
+            ?.map((c) => _commandFromJson(c as Map<String, dynamic>))
+            .toList() ??
+        const [],
+    eventHistory: (json['eventHistory'] as List<dynamic>?)
+            ?.map((e) => MatchEvent.fromJson(e as Map<String, dynamic>))
+            .toList() ??
+        const [],
+    transitionHistory: (json['transitionHistory'] as List<dynamic>?)
+            ?.map((t) => StateTransition.fromJson(t as Map<String, dynamic>))
+            .toList() ??
+        const [],
+    turnHistory: (json['turnHistory'] as List<dynamic>?)
+            ?.map((t) => PlayerTurn.fromJson(t as Map<String, dynamic>))
+            .toList() ??
+        const [],
+    scoreHistory: (json['scoreHistory'] as List<dynamic>?)
+            ?.map((s) => Score.fromJson(s as Map<String, dynamic>))
+            .toList() ??
+        const [],
   );
 
   static MatchState _stateFromJson(String name) => switch (name) {
@@ -78,6 +108,36 @@ class Match {
     MatchFinishedState() => 'matchFinished',
     MatchCancelledState() => 'cancelled',
   };
+
+  static MatchCommand _commandFromJson(Map<String, dynamic> json) {
+    final type = json['type'] as String;
+    switch (type) {
+      case 'CreateMatchCommand':
+        return const DummyMatchCommand('CreateMatchCommand');
+      case 'JoinMatchCommand':
+        return const DummyMatchCommand('JoinMatchCommand');
+      case 'LeaveMatchCommand':
+        return const DummyMatchCommand('LeaveMatchCommand');
+      case 'StartMatchCommand':
+        return const DummyMatchCommand('StartMatchCommand');
+      case 'ChooseWordCommand':
+        return const DummyMatchCommand('ChooseWordCommand');
+      case 'SubmitGuessCommand':
+        return const DummyMatchCommand('SubmitGuessCommand');
+      case 'SkipTurnCommand':
+        return const DummyMatchCommand('SkipTurnCommand');
+      case 'EndRoundCommand':
+        return const DummyMatchCommand('EndRoundCommand');
+      case 'FinishMatchCommand':
+        return const DummyMatchCommand('FinishMatchCommand');
+      case 'CancelMatchCommand':
+        return const DummyMatchCommand('CancelMatchCommand');
+      case 'ReadyPlayerCommand':
+        return const DummyMatchCommand('ReadyPlayerCommand');
+      default:
+        return const DummyMatchCommand('Unknown');
+    }
+  }
 
   /// Unique match identifier.
   final MatchId id;
@@ -108,6 +168,21 @@ class Match {
 
   /// Index into [rounds] for the active round.
   final int currentRoundIndex;
+
+  /// Audit history of commands processed.
+  final List<MatchCommand> commandHistory;
+
+  /// Audit history of events generated.
+  final List<MatchEvent> eventHistory;
+
+  /// Audit history of state transitions.
+  final List<StateTransition> transitionHistory;
+
+  /// Audit history of turns played.
+  final List<PlayerTurn> turnHistory;
+
+  /// Audit history of scores awarded.
+  final List<Score> scoreHistory;
 
   /// Currently active round, or null if not yet started.
   Round? get currentRound =>
@@ -144,6 +219,11 @@ class Match {
     DateTime? startedAt,
     MatchResult? result,
     int? currentRoundIndex,
+    List<MatchCommand>? commandHistory,
+    List<MatchEvent>? eventHistory,
+    List<StateTransition>? transitionHistory,
+    List<PlayerTurn>? turnHistory,
+    List<Score>? scoreHistory,
   }) => Match(
     id: id ?? this.id,
     hostId: hostId ?? this.hostId,
@@ -155,6 +235,11 @@ class Match {
     startedAt: startedAt ?? this.startedAt,
     result: result ?? this.result,
     currentRoundIndex: currentRoundIndex ?? this.currentRoundIndex,
+    commandHistory: commandHistory ?? this.commandHistory,
+    eventHistory: eventHistory ?? this.eventHistory,
+    transitionHistory: transitionHistory ?? this.transitionHistory,
+    turnHistory: turnHistory ?? this.turnHistory,
+    scoreHistory: scoreHistory ?? this.scoreHistory,
   );
 
   /// Converts this [Match] to a JSON-serializable map.
@@ -169,6 +254,11 @@ class Match {
     'startedAt': startedAt?.toIso8601String(),
     'result': result?.toJson(),
     'currentRoundIndex': currentRoundIndex,
+    'commandHistory': commandHistory.map((c) => {'type': c.runtimeType.toString()}).toList(),
+    'eventHistory': eventHistory.map((e) => e.toJson()).toList(),
+    'transitionHistory': transitionHistory.map((t) => t.toJson()).toList(),
+    'turnHistory': turnHistory.map((t) => t.toJson()).toList(),
+    'scoreHistory': scoreHistory.map((s) => s.toJson()).toList(),
   };
 
   @override

@@ -17,6 +17,10 @@ class TurnManager {
   int _currentIndex;
   final List<PlayerTurn> _turnHistory = [];
 
+  /// Current index of the drawer slot.
+  int get currentIndex => _currentIndex;
+  set currentIndex(int value) => _currentIndex = value;
+
   // ───────────────────────────────────────────────────────────────────────────
   // Queries
   // ───────────────────────────────────────────────────────────────────────────

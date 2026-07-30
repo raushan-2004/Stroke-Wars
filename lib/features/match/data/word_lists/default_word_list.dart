@@ -42,6 +42,8 @@ class DefaultWordList implements WordRepository {
       WordDifficulty.values.toList();
 
   /// The complete built-in word list.
+  static const List<Word> words = _words;
+
   static const List<Word> _words = [
     // ─── ANIMALS — Easy ──────────────────────────────────────────────────────
     Word(id: 'a_easy_01', text: 'Cat', difficulty: WordDifficulty.easy, category: WordCategory.animals, hints: ['It purrs', 'Has whiskers']),
