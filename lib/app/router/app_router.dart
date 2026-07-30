@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import 'package:stroke_wars/features/practice/presentation/practice_page.dart';
+import 'package:stroke_wars/features/lan/presentation/lan_session_page.dart';
 import 'package:stroke_wars/features/home/domain/repositories/dashboard_registry.dart';
 import 'package:stroke_wars/features/home/presentation/game_command_center_page.dart';
 import 'package:stroke_wars/features/home/presentation/placeholder_page.dart';
@@ -155,11 +156,7 @@ GoRouter appRouter(AppRouterRef ref) {
         path: '/lan',
         name: 'lan',
         builder: (BuildContext context, GoRouterState state) {
-          final module = ref
-              .read(dashboardRegistryProvider)
-              .getPrimaryModules()
-              .firstWhere((m) => m.id == 'lan_play');
-          return SWPlaceholderPage(module: module);
+          return const LANSessionPage();
         },
       ),
       GoRoute(

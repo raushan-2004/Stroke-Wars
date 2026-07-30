@@ -114,18 +114,18 @@ void main() {
         addTearDown(tester.view.resetPhysicalSize);
 
         final registry = DashboardRegistry();
-        final lanModule = registry.getPrimaryModules().firstWhere(
-          (m) => m.id == 'lan_play',
+        final bluetoothModule = registry.getPrimaryModules().firstWhere(
+          (m) => m.id == 'bluetooth_play',
         );
 
         await tester.pumpWidget(
-          buildTestApp(Scaffold(body: SWDashboardCard(module: lanModule))),
+          buildTestApp(Scaffold(body: SWDashboardCard(module: bluetoothModule))),
         );
 
         await tester.pumpAndSettle();
 
-        // Verify stage badge is present (e.g. "Stage 6" or similar)
-        expect(find.text('Stage 6'), findsOneWidget);
+        // Verify stage badge is present (e.g. "Stage 5" or similar)
+        expect(find.text('Stage 5'), findsOneWidget);
 
         // Flush microtasks and complete any scheduled Riverpod auto-dispose timers.
         await tester.pumpAndSettle(const Duration(milliseconds: 50));

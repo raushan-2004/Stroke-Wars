@@ -40,7 +40,7 @@ class DashboardRegistry {
         subtitle: 'Play over local Wi-Fi or mobile hotspots.',
         icon: Icons.wifi_rounded,
         route: '/lan',
-        featureState: FeatureState.comingSoon,
+        featureState: FeatureState.enabled,
         stage: 'Stage 6',
       ),
       DashboardModule(
