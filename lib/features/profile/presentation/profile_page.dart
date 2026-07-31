@@ -13,6 +13,7 @@ import 'package:stroke_wars/features/profile/domain/models/player.dart';
 import 'package:stroke_wars/features/profile/domain/models/player_statistics.dart';
 import 'package:stroke_wars/features/profile/domain/repositories/achievement_repository.dart';
 import 'package:stroke_wars/shared/design_language/swdl.dart';
+import 'package:stroke_wars/features/competitive/providers/competitive_providers.dart';
 
 /// Player profile page displaying gaming statistics, unlocked achievements, and preferences.
 class ProfilePage extends ConsumerWidget {
@@ -66,7 +67,7 @@ class ProfilePage extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _buildAvatarCard(context, player, xpProgress),
+            _buildAvatarCard(context, ref, player, xpProgress),
             SizedBox(height: context.swSpacing.lg),
             _buildStatsSection(context, stats, winRate, avgGuessTime),
             SizedBox(height: context.swSpacing.lg),
@@ -83,11 +84,14 @@ class ProfilePage extends ConsumerWidget {
 
   Widget _buildAvatarCard(
     BuildContext context,
+    WidgetRef ref,
     Player player,
     double xpProgress,
   ) {
     final colors = context.swColors;
     final typography = context.swTypography;
+    final progression = ref.watch(activeProgressionProvider);
+    final season = ref.watch(activeSeasonProgressProvider);
 
     return SWGlassCard(
       child: Column(
@@ -119,7 +123,20 @@ class ProfilePage extends ConsumerWidget {
           ],
           SizedBox(height: context.swSpacing.xs),
           Text(
-            player.cosmetics.badge.toUpperCase(),
+            'Rank: ${progression.rank} | Prestige: ${progression.prestige} | Season Lvl: ${season.currentTier}',
+            style: typography.caption.copyWith(
+              color: colors.primary,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          SizedBox(height: context.swSpacing.xs),
+          Text(
+            'Titles: ${progression.titles.join(", ")}',
+            style: typography.caption.copyWith(color: colors.textSecondary),
+          ),
+          SizedBox(height: context.swSpacing.xs),
+          Text(
+            'Badges: ${progression.badges.join(", ")}',
             style: typography.caption.copyWith(
               color: colors.secondary,
               fontWeight: FontWeight.w900,

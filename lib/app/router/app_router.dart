@@ -17,6 +17,10 @@ import 'package:stroke_wars/features/showcase/presentation/showcase_page.dart';
 import 'package:stroke_wars/features/splash/presentation/splash_page.dart';
 import 'package:stroke_wars/features/replay/presentation/match_history_page.dart';
 import 'package:stroke_wars/features/replay/presentation/replay_page.dart';
+import 'package:stroke_wars/features/competitive/presentation/social_hub_page.dart';
+import 'package:stroke_wars/features/competitive/presentation/missions_page.dart';
+import 'package:stroke_wars/features/competitive/presentation/shop_page.dart';
+import 'package:stroke_wars/features/competitive/presentation/leaderboards_page.dart';
 
 part 'app_router.g.dart';
 
@@ -261,6 +265,34 @@ GoRouter appRouter(AppRouterRef ref) {
             },
           ),
         ],
+      ),
+      GoRoute(
+        path: '/social',
+        name: 'social',
+        builder: (BuildContext context, GoRouterState state) {
+          return const SocialHubPage();
+        },
+      ),
+      GoRoute(
+        path: '/missions',
+        name: 'missions',
+        builder: (BuildContext context, GoRouterState state) {
+          return const MissionsPage();
+        },
+      ),
+      GoRoute(
+        path: '/shop',
+        name: 'shop',
+        builder: (BuildContext context, GoRouterState state) {
+          return const ShopPage();
+        },
+      ),
+      GoRoute(
+        path: '/leaderboards',
+        name: 'leaderboards',
+        builder: (BuildContext context, GoRouterState state) {
+          return const LeaderboardsPage();
+        },
       ),
     ],
   );
