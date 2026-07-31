@@ -45,6 +45,7 @@ class OnlineSessionController {
   final List<void Function(OnlineSession)> _listeners = [];
 
   OnlineSession get session => _coordinator.session;
+  WebSocketTransport get transport => _coordinator.transport;
 
   void addListener(void Function(OnlineSession) listener) {
     _listeners.add(listener);

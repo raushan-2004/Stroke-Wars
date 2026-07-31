@@ -188,9 +188,11 @@ class WebSocketTransport implements GameTransport {
         return;
       }
 
-      _messageStreamController.add(
-        TransportMessage(senderId: 'server', content: data),
-      );
+      if (!_messageStreamController.isClosed) {
+        _messageStreamController.add(
+          TransportMessage(senderId: 'server', content: data),
+        );
+      }
     }
   }
 
@@ -265,11 +267,16 @@ class WebSocketTransport implements GameTransport {
 
   void _updateState(TransportConnectionState newState) {
     _state = newState;
-    _stateStreamController.add(newState);
+    if (!_stateStreamController.isClosed) {
+      _stateStreamController.add(newState);
+    }
   }
 
   void dispose() {
-    disconnect();
+    _shouldReconnect = false;
+    _stopHeartbeat();
+    _socket?.close();
+    _socket = null;
     _messageStreamController.close();
     _stateStreamController.close();
   }

@@ -22,6 +22,7 @@ enum OnlineSessionState {
   browsing,
   lobby,
   waiting,
+  gameplay,
   closed,
 }
 

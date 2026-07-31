@@ -93,6 +93,7 @@ class OnlineSessionCoordinator {
 
   OnlineSession _session = OnlineSession.initial();
   OnlineSession get session => _session;
+  WebSocketTransport get transport => _transport;
 
   StreamSubscription<TransportMessage>? _messagesSub;
   StreamSubscription<TransportConnectionState>? _connStateSub;
@@ -212,9 +213,9 @@ class OnlineSessionCoordinator {
           .map((item) => DiscoveredLobby.fromJson(item as Map<String, dynamic>))
           .toList();
       _lobbyService.updateLobbiesList(list);
-    } else if (type == 'match_start') {
+    } else if (type == 'match_start' || type == 'match_snapshot' || type == 'match_state_changed') {
       _updateSession(
-        _session.copyWith(sessionState: OnlineSessionState.waiting),
+        _session.copyWith(sessionState: OnlineSessionState.gameplay),
       );
     }
   }

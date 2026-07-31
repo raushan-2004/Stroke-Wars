@@ -6,6 +6,7 @@ import 'package:stroke_wars/core/widgets/app_scaffold.dart';
 import 'package:stroke_wars/features/online/providers/online_providers.dart';
 import 'package:stroke_wars/features/online/domain/models/online_session_models.dart';
 import 'package:stroke_wars/features/online/application/online_session_controller.dart';
+import 'package:stroke_wars/features/online_gameplay/presentation/online_game_page.dart';
 import 'package:stroke_wars/features/online/application/lobby_service.dart';
 import 'package:stroke_wars/features/profile/application/player_service.dart';
 import 'package:stroke_wars/shared/design_language/swdl.dart';
@@ -119,6 +120,9 @@ class _OnlineSessionPageState extends ConsumerState<OnlineSessionPage> {
         break;
       case OnlineSessionState.waiting:
         body = _buildWaitingView(context);
+        break;
+      case OnlineSessionState.gameplay:
+        body = const OnlineGamePage();
         break;
     }
 
