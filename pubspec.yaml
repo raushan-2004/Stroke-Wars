@@ -10,6 +10,9 @@ dependencies:
   flutter:
     sdk: flutter
 
+  # Icons
+  cupertino_icons: ^1.0.8
+
   # State Management
   flutter_riverpod: ^2.6.1
   riverpod_annotation: ^2.6.1
@@ -53,6 +56,9 @@ dependencies:
 
   # Logging
   logger: ^2.5.0
+
+  # Cryptography (SHA-256 replay integrity)
+  crypto: ^3.0.3
 
 dev_dependencies:
   flutter_test:
