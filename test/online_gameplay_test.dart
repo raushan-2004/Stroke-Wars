@@ -21,7 +21,8 @@ import 'package:stroke_wars/features/match/application/scoring_engine.dart';
 import 'package:stroke_wars/features/match/application/sequence_generator.dart';
 import 'package:stroke_wars/features/match/application/word_selector.dart';
 import 'package:stroke_wars/features/match/data/word_lists/default_word_list.dart';
-import 'package:stroke_wars/features/match/domain/models/match.dart' as gameplay;
+import 'package:stroke_wars/features/match/domain/models/match.dart'
+    as gameplay;
 import 'package:stroke_wars/features/match/domain/models/match_configuration.dart';
 import 'package:stroke_wars/features/match/domain/models/match_id.dart';
 import 'package:stroke_wars/features/match/domain/models/match_state.dart';
@@ -81,18 +82,20 @@ void main() {
                 final type = map['type'] as String?;
 
                 if (type == 'auth_request') {
-                  socket.add(jsonEncode({
-                    'type': 'auth_response',
-                    'capabilities': {
-                      'protocolVersion': 1,
-                      'engineVersion': '1.0.0',
-                      'maximumPlayers': 8,
-                      'supportedFeatures': [],
-                      'compressionSupport': false,
-                      'replaySupport': false,
-                      'region': 'MOCK-US',
-                    }
-                  }));
+                  socket.add(
+                    jsonEncode({
+                      'type': 'auth_response',
+                      'capabilities': {
+                        'protocolVersion': 1,
+                        'engineVersion': '1.0.0',
+                        'maximumPlayers': 8,
+                        'supportedFeatures': [],
+                        'compressionSupport': false,
+                        'replaySupport': false,
+                        'region': 'MOCK-US',
+                      },
+                    }),
+                  );
                 }
               } catch (_) {}
             }
@@ -128,7 +131,9 @@ void main() {
 
       canvasController = CanvasController(
         renderQueue: RenderQueue(),
-        dispatcher: DrawingEventDispatcher(eventBus: drawingEventBus = DrawingEventBus()),
+        dispatcher: DrawingEventDispatcher(
+          eventBus: drawingEventBus = DrawingEventBus(),
+        ),
       );
     });
 
@@ -199,113 +204,133 @@ void main() {
       expect(successStale, isFalse);
     });
 
-    test('OnlineGameCoordinator drawer validation rejects guest drawing events local-side', () async {
-      final sessionController = OnlineSessionController(
-        matchController: matchController,
-        canvasController: canvasController,
-        commandProcessor: commandProcessor,
-        matchEventBus: matchEventBus,
-        drawingEventBus: drawingEventBus,
-        transport: WebSocketTransport(),
-        authService: MockOnlineAuthService(),
-      );
+    test(
+      'OnlineGameCoordinator drawer validation rejects guest drawing events local-side',
+      () async {
+        final sessionController = OnlineSessionController(
+          matchController: matchController,
+          canvasController: canvasController,
+          commandProcessor: commandProcessor,
+          matchEventBus: matchEventBus,
+          drawingEventBus: drawingEventBus,
+          transport: WebSocketTransport(),
+          authService: MockOnlineAuthService(),
+        );
 
-      final coordinator = OnlineGameCoordinator(
-        sessionController: sessionController,
-        matchController: matchController,
-        canvasController: canvasController,
-        transport: sessionController.transport,
-        onSessionUpdated: (_) {},
-      );
+        final coordinator = OnlineGameCoordinator(
+          sessionController: sessionController,
+          matchController: matchController,
+          canvasController: canvasController,
+          transport: sessionController.transport,
+          onSessionUpdated: (_) {},
+        );
 
-      await sessionController.connect(address: '127.0.0.1', port: 29090, playerName: 'Guesty');
-      await Future.delayed(const Duration(milliseconds: 300));
+        await sessionController.connect(
+          address: '127.0.0.1',
+          port: 29090,
+          playerName: 'Guesty',
+        );
+        await Future.delayed(const Duration(milliseconds: 300));
 
-      // Inject Match status showing Host is drawing
-      matchController.match = gameplay.Match(
-        id: const MatchId('match-123'),
-        hostId: 'host',
-        configuration: const MatchConfiguration(),
-        players: [],
-        rounds: [
-          Round(
-            id: const RoundId('round-1'),
-            matchId: const MatchId('match-123'),
-            roundNumber: 1,
-            state: const RoundActiveState(),
-            drawerSlotId: 'host', // HOST is drawer, NOT Guesty
-            configuration: const RoundConfiguration(drawTimeSecs: 60),
-            timerState: null,
-            guesses: const [],
-            scores: const [],
-          )
-        ],
-        state: const DrawingState(),
-        createdAt: DateTime.now(),
-      );
+        // Inject Match status showing Host is drawing
+        matchController.match = gameplay.Match(
+          id: const MatchId('match-123'),
+          hostId: 'host',
+          configuration: const MatchConfiguration(),
+          players: [],
+          rounds: [
+            Round(
+              id: const RoundId('round-1'),
+              matchId: const MatchId('match-123'),
+              roundNumber: 1,
+              state: const RoundActiveState(),
+              drawerSlotId: 'host', // HOST is drawer, NOT Guesty
+              configuration: const RoundConfiguration(drawTimeSecs: 60),
+              timerState: null,
+              guesses: const [],
+              scores: const [],
+            ),
+          ],
+          state: const DrawingState(),
+          createdAt: DateTime.now(),
+        );
 
-      // Attempt to send a local drawing event
-      final event = StrokeStarted(
-        strokeId: 'stroke-1',
-        playerId: 'guesty',
-        brushId: 'classic',
-        color: '#FF0000',
-        width: 5.0,
-        opacity: 1.0,
-        timestamp: DateTime.now(),
-      );
+        // Attempt to send a local drawing event
+        final event = StrokeStarted(
+          strokeId: 'stroke-1',
+          playerId: 'guesty',
+          brushId: 'classic',
+          color: '#FF0000',
+          width: 5.0,
+          opacity: 1.0,
+          timestamp: DateTime.now(),
+        );
 
-      await coordinator.sendCanvasEvent(event);
-      await Future.delayed(const Duration(milliseconds: 200));
+        await coordinator.sendCanvasEvent(event);
+        await Future.delayed(const Duration(milliseconds: 200));
 
-      // Packet should NOT have been sent to the server socket
-      final sentDrawingPacket = receivedPackets.any((p) => p.contains('drawing_event'));
-      expect(sentDrawingPacket, isFalse);
+        // Packet should NOT have been sent to the server socket
+        final sentDrawingPacket = receivedPackets.any(
+          (p) => p.contains('drawing_event'),
+        );
+        expect(sentDrawingPacket, isFalse);
 
-      coordinator.dispose();
-      sessionController.dispose();
-    });
+        coordinator.dispose();
+        sessionController.dispose();
+      },
+    );
 
-    test('OnlineGameController coordinates lobby triggers, guesses, and transitions', () async {
-      final sessionController = OnlineSessionController(
-        matchController: matchController,
-        canvasController: canvasController,
-        commandProcessor: commandProcessor,
-        matchEventBus: matchEventBus,
-        drawingEventBus: drawingEventBus,
-        transport: WebSocketTransport(),
-        authService: MockOnlineAuthService(),
-      );
+    test(
+      'OnlineGameController coordinates lobby triggers, guesses, and transitions',
+      () async {
+        final sessionController = OnlineSessionController(
+          matchController: matchController,
+          canvasController: canvasController,
+          commandProcessor: commandProcessor,
+          matchEventBus: matchEventBus,
+          drawingEventBus: drawingEventBus,
+          transport: WebSocketTransport(),
+          authService: MockOnlineAuthService(),
+        );
 
-      final controller = OnlineGameController(
-        sessionController: sessionController,
-        matchController: matchController,
-        canvasController: canvasController,
-        transport: sessionController.transport,
-      );
+        final controller = OnlineGameController(
+          sessionController: sessionController,
+          matchController: matchController,
+          canvasController: canvasController,
+          transport: sessionController.transport,
+        );
 
-      final states = <OnlineGameSession>[];
-      controller.addListener(states.add);
+        final states = <OnlineGameSession>[];
+        controller.addListener(states.add);
 
-      await sessionController.connect(address: '127.0.0.1', port: 29090, playerName: 'Guesty');
-      await Future.delayed(const Duration(milliseconds: 300));
+        await sessionController.connect(
+          address: '127.0.0.1',
+          port: 29090,
+          playerName: 'Guesty',
+        );
+        await Future.delayed(const Duration(milliseconds: 300));
 
-      // Toggle Ready check
-      await controller.toggleReady(true);
-      await Future.delayed(const Duration(milliseconds: 200));
+        // Toggle Ready check
+        await controller.toggleReady(true);
+        await Future.delayed(const Duration(milliseconds: 200));
 
-      final sentReadyPacket = receivedPackets.any((p) => p.contains('ready_toggle_request'));
-      expect(sentReadyPacket, isTrue);
+        final sentReadyPacket = receivedPackets.any(
+          (p) => p.contains('ready_toggle_request'),
+        );
+        expect(sentReadyPacket, isTrue);
 
-      // Guess check
-      await controller.sendGuess('Strawberry');
-      await Future.delayed(const Duration(milliseconds: 200));
+        // Guess check
+        await controller.sendGuess('Strawberry');
+        await Future.delayed(const Duration(milliseconds: 200));
 
-      final sentGuessPacket = receivedPackets.any((p) => p.contains('submit_guess'));
-      expect(sentGuessPacket, isTrue);
+        final sentGuessPacket = receivedPackets.any(
+          (p) => p.contains('submit_guess'),
+        );
+        expect(sentGuessPacket, isTrue);
 
-      controller.dispose();
-      sessionController.dispose();
-    });
+        controller.dispose();
+        sessionController.dispose();
+      },
+    );
   });
 }

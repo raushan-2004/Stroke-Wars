@@ -76,7 +76,9 @@ class ServerEventDispatcher {
           senderId: payload['senderId'] as String? ?? 'unknown',
           senderName: payload['senderName'] as String? ?? 'Anonymous',
           text: payload['text'] as String? ?? '',
-          timestamp: DateTime.tryParse(payload['timestamp'] as String? ?? '') ?? DateTime.now(),
+          timestamp:
+              DateTime.tryParse(payload['timestamp'] as String? ?? '') ??
+              DateTime.now(),
         );
         onChatMessageReceived(msg);
         break;

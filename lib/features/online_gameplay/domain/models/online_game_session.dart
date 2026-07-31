@@ -28,12 +28,12 @@ class NetworkOverlayState {
   });
 
   factory NetworkOverlayState.initial() => const NetworkOverlayState(
-        latency: 0.0,
-        jitter: 0.0,
-        packetLoss: 0.0,
-        reconnectStatus: 'Connected',
-        synchronizationStatus: 'Synchronized',
-      );
+    latency: 0.0,
+    jitter: 0.0,
+    packetLoss: 0.0,
+    reconnectStatus: 'Connected',
+    synchronizationStatus: 'Synchronized',
+  );
 
   final double latency;
   final double jitter;
@@ -53,7 +53,8 @@ class NetworkOverlayState {
       jitter: jitter ?? this.jitter,
       packetLoss: packetLoss ?? this.packetLoss,
       reconnectStatus: reconnectStatus ?? this.reconnectStatus,
-      synchronizationStatus: synchronizationStatus ?? this.synchronizationStatus,
+      synchronizationStatus:
+          synchronizationStatus ?? this.synchronizationStatus,
     );
   }
 }
@@ -74,14 +75,14 @@ class OnlineGameSession {
   });
 
   factory OnlineGameSession.initial() => OnlineGameSession(
-        onlineSession: OnlineSession.initial(),
-        canvasState: CanvasState.initial(),
-        players: const [],
-        connectionQuality: ConnectionQuality.disconnected,
-        synchronizationState: SynchronizationState.outOfSync,
-        onlineGameState: OnlineGameState.disconnected,
-        networkOverlayState: NetworkOverlayState.initial(),
-      );
+    onlineSession: OnlineSession.initial(),
+    canvasState: CanvasState.initial(),
+    players: const [],
+    connectionQuality: ConnectionQuality.disconnected,
+    synchronizationState: SynchronizationState.outOfSync,
+    onlineGameState: OnlineGameState.disconnected,
+    networkOverlayState: NetworkOverlayState.initial(),
+  );
 
   final OnlineSession onlineSession;
   final Match? currentMatch;
@@ -113,7 +114,9 @@ class OnlineGameSession {
       players: players ?? this.players,
       connectionQuality: connectionQuality ?? this.connectionQuality,
       synchronizationState: synchronizationState ?? this.synchronizationState,
-      currentDrawer: currentDrawer != null ? currentDrawer() : this.currentDrawer,
+      currentDrawer: currentDrawer != null
+          ? currentDrawer()
+          : this.currentDrawer,
       round: round != null ? round() : this.round,
       onlineGameState: onlineGameState ?? this.onlineGameState,
       networkOverlayState: networkOverlayState ?? this.networkOverlayState,

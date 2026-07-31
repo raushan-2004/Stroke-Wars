@@ -13,7 +13,9 @@ class OnlineGameSessionStateNotifier extends _$OnlineGameSessionStateNotifier {
 
   @override
   OnlineGameSession build() {
-    final sessionNotifier = ref.watch(onlineSessionStateNotifierProvider.notifier);
+    final sessionNotifier = ref.watch(
+      onlineSessionStateNotifierProvider.notifier,
+    );
     final sessionController = sessionNotifier.controller;
 
     _controller = OnlineGameController(

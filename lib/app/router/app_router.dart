@@ -15,6 +15,8 @@ import 'package:stroke_wars/features/profile/presentation/profile_page.dart';
 import 'package:stroke_wars/features/settings/presentation/settings_page.dart';
 import 'package:stroke_wars/features/showcase/presentation/showcase_page.dart';
 import 'package:stroke_wars/features/splash/presentation/splash_page.dart';
+import 'package:stroke_wars/features/replay/presentation/match_history_page.dart';
+import 'package:stroke_wars/features/replay/presentation/replay_page.dart';
 
 part 'app_router.g.dart';
 
@@ -40,6 +42,9 @@ abstract final class AppRoutes {
 
   /// The path for the developer component showcase.
   static const String showcase = '/showcase';
+
+  /// The path for replays and match history.
+  static const String replays = '/replays';
 }
 
 /// Provides the central [GoRouter] instance configured with app routes and PIS redirects.
@@ -239,6 +244,23 @@ GoRouter appRouter(AppRouterRef ref) {
               .firstWhere((m) => m.id == 'about');
           return SWPlaceholderPage(module: module);
         },
+      ),
+      GoRoute(
+        path: '/replays',
+        name: 'replays',
+        builder: (BuildContext context, GoRouterState state) {
+          return const MatchHistoryPage();
+        },
+        routes: [
+          GoRoute(
+            path: ':replayId',
+            name: 'replay_view',
+            builder: (BuildContext context, GoRouterState state) {
+              final replayId = state.pathParameters['replayId']!;
+              return ReplayPage(replayId: replayId);
+            },
+          ),
+        ],
       ),
     ],
   );

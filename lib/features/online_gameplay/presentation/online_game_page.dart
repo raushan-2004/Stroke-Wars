@@ -63,7 +63,8 @@ class _OnlineGamePageState extends ConsumerState<OnlineGamePage> {
     }
 
     final round = gameSession.round;
-    final localPlayerId = gameSession.onlineSession.player?.id.value ?? 'player';
+    final localPlayerId =
+        gameSession.onlineSession.player?.id.value ?? 'player';
     final isLocalDrawer = round?.drawerSlotId == localPlayerId;
 
     final secondsLeft = round?.timerState != null
@@ -99,7 +100,10 @@ class _OnlineGamePageState extends ConsumerState<OnlineGamePage> {
                           bottom: spacing.md.r,
                           left: spacing.md.r,
                           right: spacing.md.r,
-                          child: _buildDrawingToolbar(context, notifier.controller.canvasController),
+                          child: _buildDrawingToolbar(
+                            context,
+                            notifier.controller.canvasController,
+                          ),
                         ),
                     ],
                   ),
@@ -115,9 +119,7 @@ class _OnlineGamePageState extends ConsumerState<OnlineGamePage> {
                     ),
                     child: Column(
                       children: [
-                        Expanded(
-                          child: _buildChatFeed(context, notifier),
-                        ),
+                        Expanded(child: _buildChatFeed(context, notifier)),
                         Divider(color: colors.border, height: 1),
                         if (!isLocalDrawer) _buildGuessInput(context, notifier),
                       ],
@@ -144,7 +146,10 @@ class _OnlineGamePageState extends ConsumerState<OnlineGamePage> {
     final overlay = session.networkOverlayState;
 
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: spacing.md.r, vertical: spacing.sm.r),
+      padding: EdgeInsets.symmetric(
+        horizontal: spacing.md.r,
+        vertical: spacing.sm.r,
+      ),
       color: colors.surface,
       child: SafeArea(
         bottom: false,
@@ -159,19 +164,26 @@ class _OnlineGamePageState extends ConsumerState<OnlineGamePage> {
                   color: isDrawer ? colors.primary : colors.secondary,
                 ),
                 SizedBox(width: spacing.md),
-                 if (isDrawer && session.round?.word != null)
+                if (isDrawer && session.round?.word != null)
                   Text(
                     'Word: ${session.round!.word!.text}',
-                    style: typography.body.copyWith(fontWeight: FontWeight.bold),
+                    style: typography.body.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
               ],
             ),
 
             // Timer
             Container(
-              padding: EdgeInsets.symmetric(horizontal: spacing.md.r, vertical: spacing.xs.r),
+              padding: EdgeInsets.symmetric(
+                horizontal: spacing.md.r,
+                vertical: spacing.xs.r,
+              ),
               decoration: BoxDecoration(
-                color: secondsLeft < 10 ? colors.danger.withValues(alpha: 0.1) : colors.surfaceContainer,
+                color: secondsLeft < 10
+                    ? colors.danger.withValues(alpha: 0.1)
+                    : colors.surfaceContainer,
                 borderRadius: BorderRadius.circular(20.r),
               ),
               child: Text(
@@ -185,7 +197,11 @@ class _OnlineGamePageState extends ConsumerState<OnlineGamePage> {
             // Network Overlay HUD
             Row(
               children: [
-                Icon(Icons.wifi_tethering_rounded, size: 16.r, color: colors.textMuted),
+                Icon(
+                  Icons.wifi_tethering_rounded,
+                  size: 16.r,
+                  color: colors.textMuted,
+                ),
                 SizedBox(width: spacing.xs),
                 Text(
                   '${overlay.latency.toInt()}ms',
@@ -194,7 +210,9 @@ class _OnlineGamePageState extends ConsumerState<OnlineGamePage> {
                 SizedBox(width: spacing.sm),
                 SWBadge(
                   label: overlay.synchronizationStatus,
-                  color: overlay.synchronizationStatus == 'synchronized' ? colors.success : colors.warning,
+                  color: overlay.synchronizationStatus == 'synchronized'
+                      ? colors.success
+                      : colors.warning,
                 ),
               ],
             ),
@@ -204,7 +222,10 @@ class _OnlineGamePageState extends ConsumerState<OnlineGamePage> {
     );
   }
 
-  Widget _buildDrawingToolbar(BuildContext context, CanvasController controller) {
+  Widget _buildDrawingToolbar(
+    BuildContext context,
+    CanvasController controller,
+  ) {
     final colors = context.swColors;
     final spacing = context.swSpacing;
 
@@ -213,7 +234,9 @@ class _OnlineGamePageState extends ConsumerState<OnlineGamePage> {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           // Colors
-          ...[Colors.cyan, Colors.pink, Colors.yellow, Colors.white].map((color) {
+          ...[Colors.cyan, Colors.pink, Colors.yellow, Colors.white].map((
+            color,
+          ) {
             final selected = _selectedColor == color;
             return GestureDetector(
               onTap: () {
@@ -237,7 +260,10 @@ class _OnlineGamePageState extends ConsumerState<OnlineGamePage> {
 
           // Eraser
           IconButton(
-            icon: Icon(Icons.cleaning_services_rounded, color: colors.textMuted),
+            icon: Icon(
+              Icons.cleaning_services_rounded,
+              color: colors.textMuted,
+            ),
             onPressed: () {
               controller.clear();
             },
@@ -247,7 +273,10 @@ class _OnlineGamePageState extends ConsumerState<OnlineGamePage> {
     );
   }
 
-  Widget _buildChatFeed(BuildContext context, OnlineGameSessionStateNotifier notifier) {
+  Widget _buildChatFeed(
+    BuildContext context,
+    OnlineGameSessionStateNotifier notifier,
+  ) {
     final colors = context.swColors;
     final typography = context.swTypography;
     final history = notifier.controller.chatHistory;
@@ -264,7 +293,10 @@ class _OnlineGamePageState extends ConsumerState<OnlineGamePage> {
               children: [
                 TextSpan(
                   text: '${msg.senderName}: ',
-                  style: typography.body.copyWith(fontWeight: FontWeight.bold, color: colors.primary),
+                  style: typography.body.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: colors.primary,
+                  ),
                 ),
                 TextSpan(
                   text: msg.text,
@@ -278,7 +310,10 @@ class _OnlineGamePageState extends ConsumerState<OnlineGamePage> {
     );
   }
 
-  Widget _buildGuessInput(BuildContext context, OnlineGameSessionStateNotifier notifier) {
+  Widget _buildGuessInput(
+    BuildContext context,
+    OnlineGameSessionStateNotifier notifier,
+  ) {
     final colors = context.swColors;
     final spacing = context.swSpacing;
 

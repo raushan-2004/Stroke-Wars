@@ -118,19 +118,13 @@ class OnlineGameCoordinator {
 
   /// Submits a gameplay guess to the server.
   Future<void> sendGuess(String guessText) async {
-    final packet = jsonEncode({
-      'type': 'submit_guess',
-      'guessText': guessText,
-    });
+    final packet = jsonEncode({'type': 'submit_guess', 'guessText': guessText});
     await transport.send('server', packet);
   }
 
   /// Chooses a round word from selection.
   Future<void> chooseWord(String wordId) async {
-    final packet = jsonEncode({
-      'type': 'choose_word',
-      'wordId': wordId,
-    });
+    final packet = jsonEncode({'type': 'choose_word', 'wordId': wordId});
     await transport.send('server', packet);
   }
 
@@ -143,26 +137,39 @@ class OnlineGameCoordinator {
       final success = _snapshotApplier.applySnapshot(snapshot, hostId);
       if (success) {
         final match = matchController.match;
-        _updateState(_gameState.copyWith(
-          currentMatch: () => match,
-          round: () => match?.currentRound,
-          players: match?.players.map((p) => PlayerConnection(
-            peerInfo: PeerInfo(
-              id: PeerId(p.playerId),
-              displayName: p.displayName,
-              address: '127.0.0.1',
-              port: 0,
-            ),
-            connectionState: p.isConnected ? NetworkConnectionState.connected : NetworkConnectionState.disconnected,
-            isReady: p.isReady,
-            lastSeen: DateTime.now(),
-          )).toList().cast<PlayerConnection>() ?? const [],
-          onlineGameState: _mapMatchState(match?.state),
-          currentDrawer: () => match?.currentRound?.drawerSlotId,
-        ));
+        _updateState(
+          _gameState.copyWith(
+            currentMatch: () => match,
+            round: () => match?.currentRound,
+            players:
+                match?.players
+                    .map(
+                      (p) => PlayerConnection(
+                        peerInfo: PeerInfo(
+                          id: PeerId(p.playerId),
+                          displayName: p.displayName,
+                          address: '127.0.0.1',
+                          port: 0,
+                        ),
+                        connectionState: p.isConnected
+                            ? NetworkConnectionState.connected
+                            : NetworkConnectionState.disconnected,
+                        isReady: p.isReady,
+                        lastSeen: DateTime.now(),
+                      ),
+                    )
+                    .toList()
+                    .cast<PlayerConnection>() ??
+                const [],
+            onlineGameState: _mapMatchState(match?.state),
+            currentDrawer: () => match?.currentRound?.drawerSlotId,
+          ),
+        );
       }
     } catch (e) {
-      AppLogger.instance.error('OnlineGameCoordinator: Failed to apply match snapshot: $e');
+      AppLogger.instance.error(
+        'OnlineGameCoordinator: Failed to apply match snapshot: $e',
+      );
     }
   }
 
@@ -171,9 +178,7 @@ class OnlineGameCoordinator {
   }
 
   void _handleLobbyUpdate(OnlineLobby lobby) {
-    _updateState(_gameState.copyWith(
-      players: lobby.players,
-    ));
+    _updateState(_gameState.copyWith(players: lobby.players));
   }
 
   void _handleChatMessage(OnlineChatMessage msg) {
@@ -190,22 +195,28 @@ class OnlineGameCoordinator {
       latency: netStats.latencyMs,
       jitter: netStats.jitterMs,
       packetLoss: netStats.packetsDropped.toDouble(),
-      reconnectStatus: session.connectionState == NetworkConnectionState.connected ? 'Connected' : 'Reconnecting',
+      reconnectStatus:
+          session.connectionState == NetworkConnectionState.connected
+          ? 'Connected'
+          : 'Reconnecting',
       synchronizationStatus: session.synchronizationState.name,
     );
 
-    _updateState(_gameState.copyWith(
-      onlineSession: session,
-      connectionQuality: session.connectionQuality,
-      synchronizationState: session.synchronizationState,
-      networkOverlayState: overlay,
-    ));
+    _updateState(
+      _gameState.copyWith(
+        onlineSession: session,
+        connectionQuality: session.connectionQuality,
+        synchronizationState: session.synchronizationState,
+        networkOverlayState: overlay,
+      ),
+    );
   }
 
-  void _onSyncStateChanged(SynchronizationState state, SynchronizationDiagnostics diag) {
-    _updateState(_gameState.copyWith(
-      synchronizationState: state,
-    ));
+  void _onSyncStateChanged(
+    SynchronizationState state,
+    SynchronizationDiagnostics diag,
+  ) {
+    _updateState(_gameState.copyWith(synchronizationState: state));
   }
 
   OnlineGameState _mapMatchState(MatchState? state) {

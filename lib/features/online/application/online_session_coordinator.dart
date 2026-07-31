@@ -213,7 +213,9 @@ class OnlineSessionCoordinator {
           .map((item) => DiscoveredLobby.fromJson(item as Map<String, dynamic>))
           .toList();
       _lobbyService.updateLobbiesList(list);
-    } else if (type == 'match_start' || type == 'match_snapshot' || type == 'match_state_changed') {
+    } else if (type == 'match_start' ||
+        type == 'match_snapshot' ||
+        type == 'match_state_changed') {
       _updateSession(
         _session.copyWith(sessionState: OnlineSessionState.gameplay),
       );

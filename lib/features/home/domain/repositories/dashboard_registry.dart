@@ -84,6 +84,15 @@ class DashboardRegistry {
         featureState: FeatureState.enabled,
       ),
       DashboardModule(
+        id: 'replays',
+        title: 'Replays',
+        subtitle: 'Watch your recorded matches and history.',
+        icon: Icons.history_rounded,
+        route: '/replays',
+        featureState: FeatureState.enabled,
+        stage: 'Stage 9',
+      ),
+      DashboardModule(
         id: 'statistics',
         title: 'Statistics',
         subtitle: 'Review match metrics and drawing times.',
