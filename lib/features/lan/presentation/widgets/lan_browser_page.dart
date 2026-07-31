@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:stroke_wars/features/lan/providers/lan_providers.dart';
 import 'package:stroke_wars/features/lan/domain/models/lan_session_models.dart';
+import 'package:stroke_wars/features/multiplayer/application/peer_discovery_service.dart';
 import 'package:stroke_wars/features/profile/application/player_service.dart';
 import 'package:stroke_wars/shared/design_language/swdl.dart';
 
@@ -166,7 +167,7 @@ class _LANBrowserPageState extends ConsumerState<LANBrowserPage> {
                 children: [
                   Text('Discovered LAN Rooms', style: typography.heading),
                   SizedBox(height: spacing.md),
-                  StreamBuilder<List<dynamic>>(
+                  StreamBuilder<List<DiscoveredRoom>>(
                     stream: browserRooms,
                     builder: (context, snapshot) {
                       final rooms = snapshot.data ?? [];
@@ -228,7 +229,7 @@ class _LANBrowserPageState extends ConsumerState<LANBrowserPage> {
                                       ? null
                                       : () => _handleJoin(
                                           room.address,
-                                          room.gamePort,
+                                          room.port,
                                         ),
                                   variant: SWButtonVariant.secondary,
                                 ),

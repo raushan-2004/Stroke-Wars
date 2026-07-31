@@ -7,15 +7,24 @@ class LoggingService {
 
   List<LogMessage> get logs => List.unmodifiable(_logs);
 
-  void addListener(void Function(LogMessage) listener) => _listeners.add(listener);
-  void removeListener(void Function(LogMessage) listener) => _listeners.remove(listener);
+  void addListener(void Function(LogMessage) listener) =>
+      _listeners.add(listener);
+  void removeListener(void Function(LogMessage) listener) =>
+      _listeners.remove(listener);
 
   /// Filters logs to remove credentials or keys.
   String filterSensitiveData(String msg) {
     // Regex matches common API keys, passwords, bearer tokens, or emails
-    final emailRegex = RegExp(r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}');
-    final authRegex = RegExp(r'(Bearer\s+[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]*)');
-    final passwordRegex = RegExp(r'(password|key|token|secret)\s*[:=]\s*[^\[\s,]+', caseSensitive: false);
+    final emailRegex = RegExp(
+      r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}',
+    );
+    final authRegex = RegExp(
+      r'(Bearer\s+[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]*)',
+    );
+    final passwordRegex = RegExp(
+      r'(password|key|token|secret)\s*[:=]\s*[^\[\s,]+',
+      caseSensitive: false,
+    );
 
     var filtered = msg;
     if (emailRegex.hasMatch(filtered)) {

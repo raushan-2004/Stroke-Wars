@@ -15,10 +15,12 @@ class MockAnalyticsService implements AnalyticsService {
 
   @override
   void trackEvent(String name, [Map<String, dynamic>? parameters]) {
-    _events.add(AnalyticsEvent(
-      name: name,
-      parameters: parameters ?? {},
-      timestamp: DateTime.now(),
-    ));
+    _events.add(
+      AnalyticsEvent(
+        name: name,
+        parameters: parameters ?? {},
+        timestamp: DateTime.now(),
+      ),
+    );
   }
 }

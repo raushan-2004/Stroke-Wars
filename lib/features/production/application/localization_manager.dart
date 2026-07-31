@@ -16,7 +16,7 @@ class LocalizationManager {
       'shop_unlock': 'Desbloquear Aspecto',
       'one_player': '1 Jugador',
       'many_players': '{} Jugadores',
-    }
+    },
   };
 
   String get currentLocale => _currentLocale;

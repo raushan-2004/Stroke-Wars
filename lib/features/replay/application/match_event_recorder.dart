@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:stroke_wars/features/canvas/application/canvas_controller.dart';
+import 'package:stroke_wars/features/canvas/application/input/drawing_event_bus.dart';
 import 'package:stroke_wars/features/canvas/domain/models/drawing_event.dart';
 import 'package:stroke_wars/features/match/application/match_controller.dart';
 import 'package:stroke_wars/features/match/application/match_event_bus.dart';
@@ -27,7 +28,7 @@ class MatchEventRecorder {
   final MatchController matchController;
   final CanvasController canvasController;
   final MatchEventBus matchEventBus;
-  final dynamic drawingEventBus; // Support different bus types cleanly
+  final DrawingEventBus? drawingEventBus;
 
   final ReplayRepository _replayRepo;
   final MatchHistoryRepository _historyRepo;
@@ -58,9 +59,10 @@ class MatchEventRecorder {
 
     _matchSub = matchEventBus.stream.listen(_handleMatchEvent);
 
-    if (drawingEventBus != null) {
+    final bus = drawingEventBus;
+    if (bus != null) {
       try {
-        _drawingSub = drawingEventBus.stream.listen(_handleDrawingEvent);
+        _drawingSub = bus.stream.listen(_handleDrawingEvent);
       } catch (_) {}
     }
 

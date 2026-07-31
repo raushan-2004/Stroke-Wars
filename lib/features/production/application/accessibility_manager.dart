@@ -4,7 +4,8 @@ class AccessibilitySettings {
   final bool highContrast;
   final bool largeText;
   final double dynamicTextScale;
-  final String colorBlindPalette; // 'none', 'protanopia', 'deuteranopia', 'tritanopia'
+  final String
+  colorBlindPalette; // 'none', 'protanopia', 'deuteranopia', 'tritanopia'
   final bool hapticsEnabled;
   final bool keyboardNavigation;
 

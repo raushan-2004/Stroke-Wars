@@ -29,8 +29,11 @@ class ReleaseValidator {
       if (!config.apiEndpoint.startsWith('https://')) {
         errors.add('Production endpoint must utilize secure https connection!');
       }
-      if (config.apiEndpoint.contains('local') || config.apiEndpoint.contains('dev')) {
-        errors.add('Production configuration points to local/test endpoint: ${config.apiEndpoint}');
+      if (config.apiEndpoint.contains('local') ||
+          config.apiEndpoint.contains('dev')) {
+        errors.add(
+          'Production configuration points to local/test endpoint: ${config.apiEndpoint}',
+        );
       }
     }
 
@@ -40,7 +43,9 @@ class ReleaseValidator {
         warnings.add('Analytics is disabled under production config!');
       }
       if (!config.crashReportingEnabled) {
-        errors.add('Crash reporting must be active for production configurations!');
+        errors.add(
+          'Crash reporting must be active for production configurations!',
+        );
       }
     }
 
@@ -62,7 +67,9 @@ class ReleaseValidator {
     if (config.environment == SWEnvironment.production) {
       // In production, debug mode settings should not be enabled
       if (config.featureFlags['experimental_brush'] == true) {
-        warnings.add('Experimental brush features remain active in production!');
+        warnings.add(
+          'Experimental brush features remain active in production!',
+        );
       }
     }
 

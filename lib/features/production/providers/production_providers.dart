@@ -16,13 +16,16 @@ part 'production_providers.g.dart';
 LoggingService loggingService(LoggingServiceRef ref) => LoggingService();
 
 @riverpod
-AnalyticsService analyticsService(AnalyticsServiceRef ref) => MockAnalyticsService();
+AnalyticsService analyticsService(AnalyticsServiceRef ref) =>
+    MockAnalyticsService();
 
 @riverpod
-CrashReportingService crashReportingService(CrashReportingServiceRef ref) => MockCrashReportingService();
+CrashReportingService crashReportingService(CrashReportingServiceRef ref) =>
+    MockCrashReportingService();
 
 @riverpod
-PerformanceMonitor performanceMonitor(PerformanceMonitorRef ref) => PerformanceMonitor();
+PerformanceMonitor performanceMonitor(PerformanceMonitorRef ref) =>
+    PerformanceMonitor();
 
 @riverpod
 DiagnosticsCenter diagnosticsCenter(DiagnosticsCenterRef ref) {
@@ -35,16 +38,20 @@ DiagnosticsCenter diagnosticsCenter(DiagnosticsCenterRef ref) {
 }
 
 @riverpod
-EnvironmentManager environmentManager(EnvironmentManagerRef ref) => EnvironmentManager();
+EnvironmentManager environmentManager(EnvironmentManagerRef ref) =>
+    EnvironmentManager();
 
 @riverpod
-ReleaseValidator releaseValidator(ReleaseValidatorRef ref) => ReleaseValidator();
+ReleaseValidator releaseValidator(ReleaseValidatorRef ref) =>
+    ReleaseValidator();
 
 @riverpod
 SecurityManager securityManager(SecurityManagerRef ref) => SecurityManager();
 
 @riverpod
-AccessibilityManager accessibilityManager(AccessibilityManagerRef ref) => AccessibilityManager();
+AccessibilityManager accessibilityManager(AccessibilityManagerRef ref) =>
+    AccessibilityManager();
 
 @riverpod
-LocalizationManager localizationManager(LocalizationManagerRef ref) => LocalizationManager();
+LocalizationManager localizationManager(LocalizationManagerRef ref) =>
+    LocalizationManager();
