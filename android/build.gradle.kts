@@ -6,9 +6,8 @@ allprojects {
 }
 
 val newBuildDir: Directory =
-    rootProject.layout.buildDirectory
-        .dir("../../build")
-        .get()
+    rootProject.layout.projectDirectory
+        .dir("C:/FlutterBuilds/StrokeWars")
 rootProject.layout.buildDirectory.value(newBuildDir)
 
 subprojects {

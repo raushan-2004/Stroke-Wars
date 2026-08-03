@@ -46,7 +46,7 @@ class PlayerLocalDataSourceImpl implements PlayerLocalDataSource {
 
   @override
   Future<void> savePlayerRaw(Map<String, dynamic> raw) async {
-    await _storage.put<dynamic>(AppConstants.playerKey, raw);
+    await _storage.put<dynamic>(AppConstants.playerKey, json.encode(raw));
   }
 
   @override
